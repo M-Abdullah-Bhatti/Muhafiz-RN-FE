@@ -11,7 +11,7 @@ import CrimeReportScreen from "../screens/Crime Buttons/CrimeReportScreen";
 import ReportAnIncident from "../screens/ReportAnIncident/ReportAnIncident";
 import CaseAssessment from "../screens/CaseAssessment/CaseAssessment";
 import CrimeTracking from "../screens/CrimeTracking/CrimeTracking";
-// import NewContact from "../screens/newContact/NewContact";
+import NewContact from "../screens/NewContact/NewContact";
 import ConnectWithAuth from "../screens/Connectwithauth/ConnectWithAuth";
 
 const Stack = createNativeStackNavigator();
@@ -44,7 +44,7 @@ function Routes() {
         <Stack.Screen name="ReportAnIncident" component={ReportAnIncident} />
         <Stack.Screen name="CaseAssessment" component={CaseAssessment} />
         <Stack.Screen name="CrimeTracking" component={CrimeTracking} />
-        {/* <Stack.Screen name="NewContact" component={NewContact} /> */}
+        <Stack.Screen name="NewContact" component={NewContact} />
         <Stack.Screen name="ConnectWithAuth" component={ConnectWithAuth} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -17,6 +17,10 @@ import { useNavigation } from "@react-navigation/native";
 import color from "../../styles/color";
 import SubmitButton from "../../component/ButtonSubmit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import postValidation from "../../utils/validations/postValidation";
+import { ShowError } from "../../utils/flashMessages";
+import { useSelector } from "react-redux";
+import jwtDecode from "jwt-decode";
 
 const PostScreen = () => {
   const [name, setName] = React.useState("");
@@ -26,6 +30,7 @@ const PostScreen = () => {
   const navigation = useNavigation();
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState({ text: "", imageUri: null });
+  const auth = useSelector((state) => state.AuthReducer);
 
   const pickMedia = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -39,13 +44,28 @@ const PostScreen = () => {
       setNewPost({ ...newPost, imageUri: result.uri });
     }
   };
+  const addPost = async () => {
+    const token = await AsyncStorage.getItem("jwt-token");
 
-  const addPost = () => {
-    setPosts([
-      ...posts,
-      { ...newPost, id: Date.now(), likes: 0, comments: [] },
-    ]);
-    setNewPost({ text: "", imageUri: null });
+    console.log("userId: ", auth.userData.id, token);
+    let body = {
+      dateAndTime: date,
+      description: description,
+    };
+
+    const error = postValidation(body);
+    if (!error) {
+      // dispatch(Singin(data));
+      console.log("hit the api hee");
+    } else {
+      ShowError(error);
+    }
+
+    // setPosts([
+    //   ...posts,
+    //   { ...newPost, id: Date.now(), likes: 0, comments: [] },
+    // ]);
+    // setNewPost({ text: "", imageUri: null });
   };
 
   const likePost = (id) => {

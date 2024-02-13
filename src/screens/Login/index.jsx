@@ -7,10 +7,12 @@ import { Singin } from "../../store/actions/auth";
 import loginValidation from "../../utils/validations/loginValidation";
 import TextInputField from "../../component/TextInputField";
 import SubmitButton from "../../component/ButtonSubmit";
-import { ShowError } from "../../utils/flashMessages";
+import { ShowError, ShowSuccess } from "../../utils/flashMessages";
 import NewtoApp from "../../component/NewtoApp";
 import animationPath from "../../constants/animationPath";
 import { ScrollView } from "react-native";
+import axios from "axios";
+import { LOGIN } from "../../configs/urls";
 
 const Login = ({ navigation }) => {
   const [data, setData] = useState({
@@ -18,9 +20,8 @@ const Login = ({ navigation }) => {
     password: "",
   });
 
-  const dispatch = useDispatch();
-
-  // Function to handle login functionality
+  console.log("data-----");
+  console.log(data);
 
   const onLogin = () => {
     const error = loginValidation(data);

@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   Button,
+  Image,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
@@ -24,10 +25,15 @@ import jwtDecode from "jwt-decode";
 import { PostData } from "../../axios/NetworkCalls";
 import { CreatePost } from "../../configs/urls";
 import axiosInstance from "../../axios";
+import { uploadImage } from "../../utils/helpers";
+import RequestLoader from "../../component/Loader/RequestLoader";
 
 const PostScreen = () => {
   const [name, setName] = React.useState("");
   const [date, setDate] = React.useState("");
+  const [image, setImage] = React.useState("");
+  const [uploadingImage, setUploadingImage] = React.useState(false);
+
   const [location, setLocation] = React.useState("");
   const [description, setDescription] = React.useState("");
   const navigation = useNavigation();
@@ -50,6 +56,11 @@ const PostScreen = () => {
     if (!result.cancelled) {
       console.log("result: ", result);
       console.log("result: ", result.uri);
+      setUploadingImage(true);
+      const image = await uploadImage(result.uri);
+      console.log("image: ", image);
+      setImage(image);
+      setUploadingImage(false);
     }
   };
   const addPost = async () => {
@@ -58,6 +69,7 @@ const PostScreen = () => {
       dateAndTime: date,
       description: description,
       user: auth.userData.id,
+      imageUrl: image || "",
     };
 
     const error = postValidation(body);
@@ -135,14 +147,32 @@ const PostScreen = () => {
           placeholder="Describe the incident"
         />
       </View>
+      {image && (
+        <View style={{ paddingHorizontal: 15, width: "100%", height: 120 }}>
+          <Image
+            source={{ uri: image }}
+            style={{
+              width: "100%",
+              height: 120,
+            }}
+            resizeMode="contain"
+          />
+        </View>
+      )}
 
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={[styles.button, styles.flexButton]}
           onPress={pickMedia}
         >
-          <Icon name="image" size={20} color="white" />
-          <Text style={styles.buttonText}>Attach Media</Text>
+          {uploadingImage ? (
+            <RequestLoader />
+          ) : (
+            <>
+              <Icon name="image" size={20} color="white" />
+              <Text style={styles.buttonText}>Attach Media</Text>
+            </>
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -262,6 +292,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     bottom: -5,
   },
+  imageContainer: {},
 });
 
 export default PostScreen;

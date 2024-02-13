@@ -7,10 +7,12 @@ import { Singin } from "../../store/actions/auth";
 import loginValidation from "../../utils/validations/loginValidation";
 import TextInputField from "../../component/TextInputField";
 import SubmitButton from "../../component/ButtonSubmit";
-import { ShowError } from "../../utils/flashMessages";
+import { ShowError, ShowSuccess } from "../../utils/flashMessages";
 import NewtoApp from "../../component/NewtoApp";
 import animationPath from "../../constants/animationPath";
 import { ScrollView } from "react-native";
+import axios from "axios";
+import { LOGIN } from "../../configs/urls";
 
 const Login = ({ navigation }) => {
   const [data, setData] = useState({
@@ -18,16 +20,19 @@ const Login = ({ navigation }) => {
     password: "",
   });
 
-  const dispatch = useDispatch();
+  console.log("data-----");
+  console.log(data);
 
-  // Function to handle login functionality
-
-  const onLogin = () => {
-    const error = loginValidation(data);
-    if (!error) {
-      dispatch(Singin(data));
-    } else {
-      ShowError(error);
+  const onLogin = async () => {
+    try {
+      const response = await axios.post(`${LOGIN}`, data);
+      if (response?.data?.status) {
+        ShowSuccess(response?.data?.message);
+      } else if (!response?.data?.status) {
+        ShowError(response?.data?.message);
+      }
+    } catch (error) {
+      ShowError(error?.message);
     }
   };
 

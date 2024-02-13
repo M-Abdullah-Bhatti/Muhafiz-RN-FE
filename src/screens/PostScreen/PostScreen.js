@@ -1,5 +1,5 @@
 // PostScreen.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { Location } from "expo";
+import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import color from "../../styles/color";
@@ -33,8 +33,9 @@ const PostScreen = () => {
   const [date, setDate] = React.useState("");
   const [image, setImage] = React.useState("");
   const [uploadingImage, setUploadingImage] = React.useState(false);
+  const [cameraUploadingImage, setCameraUploadingImage] = React.useState(false);
+  const [loader, setLoader] = React.useState(false);
 
-  const [location, setLocation] = React.useState("");
   const [description, setDescription] = React.useState("");
   const navigation = useNavigation();
   const [posts, setPosts] = useState([]);
@@ -63,6 +64,31 @@ const PostScreen = () => {
       setUploadingImage(false);
     }
   };
+
+  const openCameraAndUpload = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      alert("Sorry, we need camera permissions to make this work!");
+      return;
+    }
+    // Open the camera
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.cancelled) {
+      console.log("result: ", result);
+      console.log("result: ", result.uri);
+      setCameraUploadingImage(true);
+      const image = await uploadImage(result.uri);
+      console.log("image: ", image);
+      setImage(image);
+      setCameraUploadingImage(false);
+    }
+  };
+
   const addPost = async () => {
     // console.log("userId: ", auth.userData.id, token);
     let body = {
@@ -70,13 +96,17 @@ const PostScreen = () => {
       description: description,
       user: auth.userData.id,
       imageUrl: image || "",
+      latitude: location?.coords.latitude || "",
+      longitude: location?.coords.longitude || "",
     };
 
     const error = postValidation(body);
     if (!error) {
+      setLoader(true);
       console.log("hit the api hee", CreatePost);
       const response = await PostData(CreatePost, body);
       console.log("response: ", response);
+      setLoader(false);
     } else {
       ShowError(error);
     }
@@ -106,16 +136,41 @@ const PostScreen = () => {
     );
   };
 
-  const pinLocation = async () => {
+  // const pinLocation = async () => {
+  //   let { status } = await Location.requestForegroundPermissionsAsync();
+  //   if (status !== "granted") {
+  //     Alert.alert("Permission to access location was denied");
+  //     return;
+  //   }
+
+  //   let location = await Location.getCurrentPositionAsync({});
+  //   setNewPost({ ...newPost, location });
+  // };
+  const [location, setLocation] = useState(null);
+
+  // useEffect(() => {
+  //   requestLocationPermission();
+  // }, []);
+
+  // async function requestLocationPermission() {
+  //   let { status } = await Location.requestForegroundPermissionsAsync();
+  //   if (status !== "granted") {
+  //     Alert.alert("Permission to access location was denied");
+  //     return;
+  //   }
+  //   pinLocation();
+  // }
+
+  async function pinLocation() {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       Alert.alert("Permission to access location was denied");
       return;
     }
-
     let location = await Location.getCurrentPositionAsync({});
-    setNewPost({ ...newPost, location });
-  };
+    console.log("location: ", location);
+    setLocation(location);
+  }
 
   return (
     <View style={styles.container}>
@@ -160,6 +215,13 @@ const PostScreen = () => {
         </View>
       )}
 
+      {location && (
+        <View>
+          <Text>Latitude: {location.coords.latitude}</Text>
+          <Text>Longitude: {location.coords.longitude}</Text>
+        </View>
+      )}
+
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={[styles.button, styles.flexButton]}
@@ -185,10 +247,16 @@ const PostScreen = () => {
 
         <TouchableOpacity
           style={[styles.button, styles.flexButton]}
-          onPress={pinLocation}
+          onPress={openCameraAndUpload}
         >
-          <Icon name="camera" size={20} color="white" />
-          <Text style={styles.buttonText}>Camera</Text>
+          {cameraUploadingImage ? (
+            <RequestLoader />
+          ) : (
+            <>
+              <Icon name="camera" size={20} color="white" />
+              <Text style={styles.buttonText}>Camera</Text>
+            </>
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.flexButton]}
@@ -200,6 +268,7 @@ const PostScreen = () => {
       </View>
 
       <SubmitButton
+        loader={loader}
         text="Submit"
         onPress={addPost}
         buttonColor={color.orange}

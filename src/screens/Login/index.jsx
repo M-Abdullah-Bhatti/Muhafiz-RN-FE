@@ -15,13 +15,12 @@ import axios from "axios";
 import { LOGIN } from "../../configs/urls";
 
 const Login = ({ navigation }) => {
+  const dispatch = useDispatch();
+
   const [data, setData] = useState({
     email: "",
     password: "",
   });
-
-  console.log("data-----");
-  console.log(data);
 
   const onLogin = () => {
     const error = loginValidation(data);

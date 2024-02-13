@@ -21,6 +21,9 @@ import postValidation from "../../utils/validations/postValidation";
 import { ShowError } from "../../utils/flashMessages";
 import { useSelector } from "react-redux";
 import jwtDecode from "jwt-decode";
+import { PostData } from "../../axios/NetworkCalls";
+import { CreatePost } from "../../configs/urls";
+import axiosInstance from "../../axios";
 
 const PostScreen = () => {
   const [name, setName] = React.useState("");
@@ -40,23 +43,28 @@ const PostScreen = () => {
       quality: 1,
     });
 
+    // if (!result.cancelled) {
+    //   console.log("resultL ", result);
+    //   setNewPost({ ...newPost, imageUri: result.uri });
+    // }
     if (!result.cancelled) {
-      setNewPost({ ...newPost, imageUri: result.uri });
+      console.log("result: ", result);
+      console.log("result: ", result.uri);
     }
   };
   const addPost = async () => {
-    const token = await AsyncStorage.getItem("jwt-token");
-
-    console.log("userId: ", auth.userData.id, token);
+    // console.log("userId: ", auth.userData.id, token);
     let body = {
       dateAndTime: date,
       description: description,
+      user: auth.userData.id,
     };
 
     const error = postValidation(body);
     if (!error) {
-      // dispatch(Singin(data));
-      console.log("hit the api hee");
+      console.log("hit the api hee", CreatePost);
+      const response = await PostData(CreatePost, body);
+      console.log("response: ", response);
     } else {
       ShowError(error);
     }
@@ -257,3 +265,35 @@ const styles = StyleSheet.create({
 });
 
 export default PostScreen;
+
+// const EventApplication = async (values, actions) => {
+//   try {
+//     setLoading(true);
+
+//     const response = await PostData(
+//       `/api/createEventApplication/${id}`,
+//       values
+//     );
+
+//     console.log("response: ", response);
+
+//     if (response?.status) {
+//       toast.success(response?.message);
+//       setLoading(false);
+//       actions.resetForm();
+//       navigate(`/payment/success/${id}`);
+//     } else {
+//       toast.error(response);
+//       if (response == "You're not logged in. Please login first") {
+//         setPreviousRoute("go_back");
+//         navigate("/auth/login");
+//       }
+//     }
+//   } catch (error) {
+//     toast.error(error?.response?.data?.message);
+
+//     setLoading(true);
+//   } finally {
+//     setLoading(false);
+//   }
+// };

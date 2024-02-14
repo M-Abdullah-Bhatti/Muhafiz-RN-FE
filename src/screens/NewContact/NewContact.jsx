@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Text, StyleSheet, Image, View, TouchableOpacity } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  Image,
+  View,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { verticalScale, moderateScale } from "react-native-size-matters";
 import LottieView from "lottie-react-native";
@@ -10,12 +17,63 @@ import animationPath from "../../constants/animationPath";
 import SubmitButton from "../../component/ButtonSubmit";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { Ionicons } from "@expo/vector-icons";
+import { useSelector } from "react-redux";
+import contactValidation from "../../utils/validations/contactValidation";
+import { CreateContact } from "../../configs/urls";
+import { PostData } from "../../axios/NetworkCalls";
+import { ShowError } from "../../utils/flashMessages";
+import RequestLoader from "../../component/Loader/RequestLoader";
 //inni
 const NewContact = ({ navigation }) => {
   const [data, setData] = useState({
+    name: "",
+    phoneNumber: "",
     email: "",
-    password: "",
+    address: "",
   });
+  const auth = useSelector((state) => state.AuthReducer);
+  const [loader, setLoader] = useState(false);
+
+  const handleSubmit = async () => {
+    const body = {
+      ...data,
+      user: auth.userData.id,
+    };
+    console.log("body: ", body);
+
+    const error = contactValidation(body);
+    if (!error) {
+      try {
+        setLoader(true);
+        const response = await PostData(CreateContact, body);
+        console.log("response: ", response);
+
+        if (response?.status) {
+          setLoader(false);
+          Alert.alert("SUCCESS", response?.message, [
+            {
+              text: "Close",
+              onPress: () =>
+                setData({
+                  name: "",
+                  phoneNumber: "",
+                  email: "",
+                  address: "",
+                }),
+            },
+          ]);
+        } else {
+          ShowError(response);
+        }
+
+        setLoader(false);
+      } catch (error) {
+        ShowError(error);
+      }
+    } else {
+      ShowError(error);
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.backButtonContainer}>
@@ -45,9 +103,9 @@ const NewContact = ({ navigation }) => {
         <TextInputField
           placeholder="Enter your Phone Number"
           icon_name="phone-square"
-          value={data.number}
+          value={data.phoneNumber}
           isSecure={false}
-          onChangeText={(text) => setData({ ...data, number: text })}
+          onChangeText={(text) => setData({ ...data, phoneNumber: text })}
         />
         <TextInputField
           placeholder="Enter your email"
@@ -67,9 +125,13 @@ const NewContact = ({ navigation }) => {
         <View styles={styles.submit}>
           <TouchableOpacity
             style={[styles.btn, color ? styles.btnColor : null]}
-            // onPress={onPress}
+            onPress={handleSubmit}
           >
-            <Text style={styles.btnText}>Save</Text>
+            {loader ? (
+              <RequestLoader />
+            ) : (
+              <Text style={styles.btnText}>Save</Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>

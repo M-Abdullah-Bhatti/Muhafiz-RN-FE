@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Button,
   Image,
+  Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
@@ -102,20 +103,36 @@ const PostScreen = () => {
 
     const error = postValidation(body);
     if (!error) {
-      setLoader(true);
-      console.log("hit the api hee", CreatePost);
-      const response = await PostData(CreatePost, body);
-      console.log("response: ", response);
+      try {
+        setLoader(true);
+        const response = await PostData(CreatePost, body);
+        console.log("response: ", response);
+
+        if (response?.status) {
+          setLoader(false);
+          Alert.alert("SUCCESS", response?.message, [
+            {
+              text: "Close",
+              onPress: () => {
+                setDate("");
+                setDescription("");
+                setImage("");
+                setLocation("");
+              },
+            },
+          ]);
+        } else {
+          ShowError(response);
+        }
+
+        setLoader(false);
+      } catch (error) {
+        ShowError(error);
+      }
       setLoader(false);
     } else {
       ShowError(error);
     }
-
-    // setPosts([
-    //   ...posts,
-    //   { ...newPost, id: Date.now(), likes: 0, comments: [] },
-    // ]);
-    // setNewPost({ text: "", imageUri: null });
   };
 
   const likePost = (id) => {
@@ -136,30 +153,7 @@ const PostScreen = () => {
     );
   };
 
-  // const pinLocation = async () => {
-  //   let { status } = await Location.requestForegroundPermissionsAsync();
-  //   if (status !== "granted") {
-  //     Alert.alert("Permission to access location was denied");
-  //     return;
-  //   }
-
-  //   let location = await Location.getCurrentPositionAsync({});
-  //   setNewPost({ ...newPost, location });
-  // };
   const [location, setLocation] = useState(null);
-
-  // useEffect(() => {
-  //   requestLocationPermission();
-  // }, []);
-
-  // async function requestLocationPermission() {
-  //   let { status } = await Location.requestForegroundPermissionsAsync();
-  //   if (status !== "granted") {
-  //     Alert.alert("Permission to access location was denied");
-  //     return;
-  //   }
-  //   pinLocation();
-  // }
 
   async function pinLocation() {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -365,35 +359,3 @@ const styles = StyleSheet.create({
 });
 
 export default PostScreen;
-
-// const EventApplication = async (values, actions) => {
-//   try {
-//     setLoading(true);
-
-//     const response = await PostData(
-//       `/api/createEventApplication/${id}`,
-//       values
-//     );
-
-//     console.log("response: ", response);
-
-//     if (response?.status) {
-//       toast.success(response?.message);
-//       setLoading(false);
-//       actions.resetForm();
-//       navigate(`/payment/success/${id}`);
-//     } else {
-//       toast.error(response);
-//       if (response == "You're not logged in. Please login first") {
-//         setPreviousRoute("go_back");
-//         navigate("/auth/login");
-//       }
-//     }
-//   } catch (error) {
-//     toast.error(error?.response?.data?.message);
-
-//     setLoading(true);
-//   } finally {
-//     setLoading(false);
-//   }
-// };

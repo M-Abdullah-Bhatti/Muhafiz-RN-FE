@@ -11,3 +11,6 @@ export const CreateGoal = getApiUrl("/goals/create");
 
 // post:
 export const CreatePost = "/post/createPost";
+
+// contact:
+export const CreateContact = "/contact/createContact";

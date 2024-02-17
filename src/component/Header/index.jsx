@@ -1,11 +1,11 @@
 import React from "react";
 import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
-import { useDispatch } from 'react-redux';
-import { Signout } from '../../store/actions/auth';
+import { useDispatch } from "react-redux";
+import { Signout } from "../../store/actions/auth";
 import { useFonts } from "expo-font";
 import Icon, { Icons } from "../Icons";
 import color from "../../styles/color";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 
 const headerImage = require("../../assets/images/police.png");
 
@@ -25,60 +25,70 @@ const headerImage = require("../../assets/images/police.png");
 
 // export default NameBar;
 
-const Header = ({ navigation, setOpen, screen}) => {
-
-  const auth = useSelector(state => state.AuthReducer);
+const Header = ({ navigation, setOpen, screen }) => {
+  const auth = useSelector((state) => state.AuthReducer);
 
   const dispatch = useDispatch();
-    
-    const onLogout = () => {
-        dispatch(Signout());
-    }
 
+  const onLogout = () => {
+    dispatch(Signout());
+  };
   return (
     <View style={styles.header}>
-      {screen === 'Home' ? null:<BackButton navigation={navigation} />}
+      {screen === "Home" ? null : <BackButton navigation={navigation} />}
       <HeaderTitle name={auth.userData.name} />
-      {screen === 'Account' ? (
-        <TouchableOpacity 
-          onPress={() => {setOpen(true)}}
-        > 
-          <Icon name={'ellipsis-v'}type={Icons.FontAwesome} color={color.orange}/>
+      {screen === "Account" ? (
+        <TouchableOpacity
+          onPress={() => {
+            setOpen(true);
+          }}
+        >
+          <Icon
+            name={"ellipsis-v"}
+            type={Icons.FontAwesome}
+            color={color.orange}
+          />
         </TouchableOpacity>
-      ) : 
-      <ImageContainer image={headerImage} navigation={navigation} onLogout={onLogout}/>}
+      ) : (
+        <ImageContainer
+          image={headerImage}
+          navigation={navigation}
+          onLogout={onLogout}
+        />
+      )}
     </View>
-  )
+  );
 };
 
 const BackButton = ({ navigation }) => (
-  <TouchableOpacity
-    onPress={() => navigation.goBack()}
-  >
+  <TouchableOpacity onPress={() => navigation.goBack()}>
     <Icon
       type={Icons.MaterialCommunityIcons}
-      name={'arrow-left'}
+      name={"arrow-left"}
       color={color.orange}
     />
   </TouchableOpacity>
 );
 
-const ImageContainer = ({ image, height = "100%", width = "100%", navigation, onLogout}) => (
-  <TouchableOpacity 
+const ImageContainer = ({
+  image,
+  height = "100%",
+  width = "100%",
+  navigation,
+  onLogout,
+}) => (
+  <TouchableOpacity
     style={styles.imageContainer}
     onPress={() => {
       onLogout();
-    }} 
+    }}
   >
     {/* <Image source={image} style={[{ height, width }]} /> */}
-    <Icon
-      type={Icons.FontAwesome}
-      name={'sign-out'}
-      color={color.orange} />
+    <Icon type={Icons.FontAwesome} name={"sign-out"} color={color.orange} />
   </TouchableOpacity>
 );
 
-const HeaderTitle = ({name}) => (
+const HeaderTitle = ({ name }) => (
   <View style={styles.title}>
     <Text style={styles.bigTitle}>Hi, TBN {name}</Text>
     <Text style={styles.smallTitle}>{Date()}</Text>

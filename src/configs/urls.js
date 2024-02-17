@@ -1,4 +1,4 @@
-export const API_BASE_URL = "http://192.168.100.23:3001";
+export const API_BASE_URL = "http://192.168.100.22:3001";
 
 export const getApiUrl = (endpoint) => API_BASE_URL + endpoint;
 
@@ -15,3 +15,7 @@ export const CreatePost = "/post/createPost";
 // contact:
 export const CreateContact = "/contact/createContact";
 export const GetMyContact = "/contact/getSingleContact";
+
+// incident
+export const CreateIncident = "/incident/createIncident";
+export const GetMyIncidents = "/incident/allIncidents";

@@ -1,24 +1,24 @@
 // CrimeReportScreen.js
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Button } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons'; // Make sure to install expo vector icons
-
-
-
-
+import React from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Button,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons"; // Make sure to install expo vector icons
 
 const CrimeReportScreen = () => {
-
   const navigation = useNavigation();
 
-  const navigateToReportAnIncident = () => {
-    navigation.navigate('ReportAnIncident'); // Ensure 'MapWithButtons' is the name of your target screen
+  const navigateToReportAnIncident = (category) => {
+    navigation.navigate("ReportAnIncident", { category }); // Ensure 'MapWithButtons' is the name of your target screen
   };
 
-  
   return (
-    
     <View style={styles.container}>
       {/* Your content here */}
       <View style={styles.backButtonContainer}>
@@ -28,11 +28,17 @@ const CrimeReportScreen = () => {
       </View>
       <View style={styles.buttoncontainer}>
         {/* Three Grey Buttons */}
-        <TouchableOpacity style={styles.button} onPress={navigateToReportAnIncident}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigateToReportAnIncident("Theft")}
+        >
           {/* Icon and Text Container */}
           <View style={styles.iconTextContainer}>
             {/* Icon */}
-            <Image source={require(' ../../../src/assets/images/mask.png')} style={styles.icon} />
+            <Image
+              source={require(" ../../../src/assets/images/mask.png")}
+              style={styles.icon}
+            />
             {/* Text */}
             <View style={styles.textContainer}>
               <Text style={styles.buttonText}>Theft</Text>
@@ -40,28 +46,45 @@ const CrimeReportScreen = () => {
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={navigateToReportAnIncident}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigateToReportAnIncident("Robbery")}
+        >
           <View style={styles.iconTextContainer}>
-            <Image source={require('../../../src/assets/images/gun.png')} style={styles.icon} />
+            <Image
+              source={require("../../../src/assets/images/gun.png")}
+              style={styles.icon}
+            />
             <View style={styles.textContainer}>
               <Text style={styles.buttonText}>Robbery</Text>
               <Text style={styles.subheading}>Snatching/burglary</Text>
-              
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={navigateToReportAnIncident}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigateToReportAnIncident("Assault")}
+        >
           <View style={styles.iconTextContainer}>
-            <Image source={require('../../../src/assets/images/bully.png')} style={styles.icon} />
+            <Image
+              source={require("../../../src/assets/images/bully.png")}
+              style={styles.icon}
+            />
             <View style={styles.textContainer}>
               <Text style={styles.buttonText}>Assault</Text>
               <Text style={styles.subheading}>Abuse/Harassment</Text>
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={navigateToReportAnIncident}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigateToReportAnIncident("Cyber crime")}
+        >
           <View style={styles.iconTextContainer}>
-            <Image source={require('../../../src/assets/images/phishing.png')} style={styles.icon} />
+            <Image
+              source={require("../../../src/assets/images/phishing.png")}
+              style={styles.icon}
+            />
             <View style={styles.textContainer}>
               <Text style={styles.buttonText}>Cyber crime</Text>
               <Text style={styles.subheading}>phishing/ Spoofing</Text>
@@ -87,54 +110,54 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   backButtonContainer: {
-    top:-30,
+    top: -30,
     left: 20,
-    position: 'absolute',
+    position: "absolute",
   },
   submitButton: {
-    backgroundColor: 'blue',
+    backgroundColor: "blue",
     borderRadius: 15,
     padding: 10,
     paddingHorizontal: 30,
-    alignSelf: 'center',
+    alignSelf: "center",
     marginBottom: 120,
   },
   submitButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
   },
   cancelButton: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 15,
-    borderColor: 'black',
+    borderColor: "black",
     borderWidth: 1,
     padding: 10,
     marginBottom: 50,
     paddingHorizontal: 30,
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
-    alignSelf: 'center',
+    alignSelf: "center",
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   cancelButtonText: {
-    color: 'black',
+    color: "black",
     fontSize: 16,
   },
   buttoncontainer: {
     flex: 3,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 100,
     marginHorizontal: 20,
   },
   button: {
-    backgroundColor: '#D9D9D9',
+    backgroundColor: "#D9D9D9",
     borderRadius: 10,
     paddingVertical: 20,
     paddingTop: 20,
@@ -143,14 +166,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonText: {
-    color: 'black',
+    color: "black",
     fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
   },
   iconTextContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   textContainer: {
     marginLeft: 10,
@@ -162,7 +185,7 @@ const styles = StyleSheet.create({
   },
   subheading: {
     fontSize: 14,
-    color: 'gray',
+    color: "gray",
   },
 });
 

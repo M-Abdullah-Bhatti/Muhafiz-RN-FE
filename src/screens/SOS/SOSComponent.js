@@ -7,6 +7,7 @@ import { GetAllData } from "../../axios/NetworkCalls";
 import usePagination from "../../utils/usePagination";
 import Pagination from "../../component/Shared/Pagination";
 import RequestLoader from "../../component/Loader/RequestLoader";
+import Header from "../../component/Header";
 
 const SOSComponent = () => {
   const paginate = usePagination(1, 2);
@@ -78,6 +79,8 @@ const SOSComponent = () => {
   return (
     <View style={styles.container}>
       {/* Send SOS Heading on the top left */}
+      <Header screen={"Home"} />
+
       <Text style={styles.heading}>Send SOS</Text>
       <Text style={styles.subHeadingPlease}>Please Stay Calm</Text>
 
@@ -103,7 +106,6 @@ const SOSComponent = () => {
           description="SOS Sent"
         />
       </MapView>
-
       {/* Contacts */}
       {loading ? (
         <RequestLoader size="large" />

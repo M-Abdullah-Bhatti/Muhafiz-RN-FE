@@ -41,7 +41,7 @@ const Emergency = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Header screen={"Home"} />
+      {/* <Header screen={"Home"} /> */}
       <View style={styles.container}>
         <TouchableOpacity onPress={navigateToMapWithButtons}>
           <LinearGradient

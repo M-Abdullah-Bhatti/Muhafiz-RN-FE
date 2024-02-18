@@ -38,8 +38,20 @@ const Postingscreentalal = () => {
           const response = await GetAllData(`${GetAllPostsEndPoint}`);
 
           if (response.success) {
-            console.log(response?.data);
             setData(response?.data);
+
+            // console.log(
+            //   response?.data?.likes?.some(
+            //     (like) => like.user._id === auth.userData.id
+            //   )
+            // );
+
+            console.log(
+              "like: ",
+              response?.data?.likes?.map((item, key) =>
+                console.log("item: ", item)
+              )
+            );
           } else {
             setError(response.message);
           }
@@ -118,27 +130,19 @@ const Postingscreentalal = () => {
               <TouchableOpacity style={styles.interaction}>
                 <FontAwesome
                   name={
-                    data?.likes &&
-                    data?.likes.some(
+                    post.likes &&
+                    post.likes.length > 0 &&
+                    post.likes.some(
                       (like) => like.user._id === auth.userData.id
                     )
                       ? "heart"
                       : "heart-o"
                   }
-                  // name={"heart"} // when i like a post and it is filled
-                  // name={"heart-o"} // when someone else like a post and it is emtpy blue borderd
-                  // name={""} // when no one like a post and it is black
                   color={
                     data?.likes && data?.likes.length === 0
                       ? colors.black
                       : colors.maincolor
                   }
-                  // name="heart"
-                  // color={
-                  //   post?.likes && post.likes.length >= 1
-                  //     ? colors.maincolor
-                  //     : null
-                  // }
                   size={30}
                 />
                 <Text

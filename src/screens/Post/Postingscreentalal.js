@@ -1,45 +1,59 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, TextInput } from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+} from "react-native";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { GetAllPosts, GetAllPostsEndPoint } from "../../configs/urls";
+import { GetAllData } from "../../axios/NetworkCalls";
+import { formatDate, getPostLikesText } from "../../utils/helpers";
+import { useSelector } from "react-redux";
 
 const colors = {
-  white: '#FFFFFF',
-  orange: '#1E3EB3',
-  black: '#2f3640',
-  maincolor: '#1E3EB3',
+  white: "#FFFFFF",
+  orange: "#1E3EB3",
+  black: "#2f3640",
+  maincolor: "#1E3EB3",
 };
 
 const Postingscreentalal = () => {
-  const [like, setLike] = useState(0);
-  const [searchValue, setSearchValue] = useState('');
+  const auth = useSelector((state) => state.AuthReducer);
+  const [searchValue, setSearchValue] = useState("");
 
-  const posts = [
-    {
-      id: 1,
-      username: 'Talal',
-      timeAgo: '4min ago',
-      postText: 'Hey everyone, just a heads up – something happened in the neighborhood. Stay aware, stay safe, and look out for each other!',
-      imageUri: require('../../assets/images/robbery3.png'),
-    },
-    // Add a second post
-    {
-      id: 2,
-      username: 'Saadullah',
-      timeAgo: '10min ago',
-      postText: 'It’s a beautiful day to go out and enjoy the park! Just make sure to keep your belongings close.',
-      imageUri: require('../../assets/images/robbery2.jpeg'),
-    },
-    // Add a third post
-    {
-      id: 3,
-      username: 'Sheikh Rasheed',
-      timeAgo: '20min ago',
-      postText: 'Lost dog in the area. Please keep an eye out. Reward if found!',
-      imageUri: require('../../assets/images/robbery3.png'),
-    },
-    // ...add as many posts as you like
-  ];
-  
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
+  const [error, setError] = useState(null);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const getData = async () => {
+        try {
+          setLoading(true);
+          const response = await GetAllData(`${GetAllPostsEndPoint}`);
+
+          if (response.success) {
+            console.log(response?.data);
+            setData(response?.data);
+          } else {
+            setError(response.message);
+          }
+        } catch (err) {
+          console.error("Error fetching data:", err);
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      getData();
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
@@ -53,36 +67,89 @@ const Postingscreentalal = () => {
         />
       </View>
       <ScrollView>
-        {posts.map((post) => (
-          <View key={post.id} style={styles.card}>
+        {data.map((post, index) => (
+          <View key={index} style={styles.card}>
             <View style={styles.userInfo}>
-              {/* Replace the placeholder image with your actual user image */}
-              <Image source={require('../../assets/images/otpAvatar.png')} style={styles.userImage} />
+              <Image
+                source={require("../../assets/images/otpAvatar.png")}
+                style={styles.userImage}
+              />
               <View style={styles.userInfoText}>
-                <Text style={styles.text}>{post.username}</Text>
-                <Text style={styles.textLite}>{post.timeAgo}</Text>
+                <Text style={styles.text}>{post?.user?.username}</Text>
+                <Text style={styles.textLite}>
+                  {formatDate(post?.createdAt)}
+                </Text>
               </View>
             </View>
-            <Text style={styles.postText}>{post.postText}</Text>
-            {/* Replace the placeholder image with your actual post image */}
-            <Image source={post.imageUri} style={styles.userPost} />
+            <Text style={styles.postText}>{post?.description}</Text>
+
+            <Image source={{ uri: post?.imageUrl }} style={styles.userPost} />
             <View style={styles.interactionWrapper}>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.interaction}
-                onPress={() => (like === 0 ? setLike(1) : setLike(0))}
+                // onPress={() => (like === 0 ? setLike(1) : setLike(0))}
               >
                 <FontAwesome
-                  name={like === 1 ? 'heart' : 'heart-o'}
-                  color={like === 0 ? colors.black : colors.maincolor}
+                  name={
+                    data?.likes && data?.likes.length === 1
+                      ? "heart"
+                      : "heart-o"
+                  }
+                  color={
+                    data?.likes && data?.likes.length === 0
+                      ? colors.black
+                      : colors.maincolor
+                  }
                   size={30}
                 />
                 <Text
                   style={[
                     styles.interactionText,
-                    like === 1 ? styles.interactionTextLiked : null,
+                    data?.likes && data?.likes.length >= 1
+                      ? styles.interactionTextLiked
+                      : null,
                   ]}
                 >
-                  {like === 1 ? '14 Likes' : 'Like'}
+                  {data?.likes && data?.likes.length > 1
+                    ? `${data?.likes && data?.likes.length} Likes`
+                    : ` Like`}
+                </Text>
+              </TouchableOpacity> */}
+              <TouchableOpacity style={styles.interaction}>
+                <FontAwesome
+                  name={
+                    data?.likes &&
+                    data?.likes.some(
+                      (like) => like.user._id === auth.userData.id
+                    )
+                      ? "heart"
+                      : "heart-o"
+                  }
+                  // name={"heart"} // when i like a post and it is filled
+                  // name={"heart-o"} // when someone else like a post and it is emtpy blue borderd
+                  // name={""} // when no one like a post and it is black
+                  color={
+                    data?.likes && data?.likes.length === 0
+                      ? colors.black
+                      : colors.maincolor
+                  }
+                  // name="heart"
+                  // color={
+                  //   post?.likes && post.likes.length >= 1
+                  //     ? colors.maincolor
+                  //     : null
+                  // }
+                  size={30}
+                />
+                <Text
+                  style={[
+                    styles.interactionText,
+                    post?.likes && post.likes.length >= 1
+                      ? styles.interactionTextLiked
+                      : null,
+                  ]}
+                >
+                  {getPostLikesText(post?.likes)}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.interaction}>
@@ -100,12 +167,12 @@ const Postingscreentalal = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     padding: 15,
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: colors.white,
     marginVertical: 8,
     padding: 15,
@@ -128,7 +195,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   userInfo: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   userImage: {
     width: 50,
@@ -136,13 +203,13 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   userInfoText: {
-    flexDirection: 'column',
-    justifyContent: 'center',
+    flexDirection: "column",
+    justifyContent: "center",
     marginLeft: 10,
   },
   text: {
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   textLite: {
     fontSize: 12,
@@ -154,25 +221,25 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   userPost: {
-    width: '100%',
-    height: undefined,
+    width: "100%",
+    // height: undefined,
     aspectRatio: 1,
     borderRadius: 10,
   },
   interactionWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     padding: 15,
   },
   interaction: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     borderRadius: 5,
     padding: 5,
   },
   interactionText: {
     fontSize: 13,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 5,
     marginLeft: 3,
   },

@@ -1,19 +1,43 @@
 // Import the storage service
 import { storage } from "../firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import required functions
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export const uploadImage = async (imageUri) => {
   const response = await fetch(imageUri);
   const blob = await response.blob();
   const filename = imageUri.substring(imageUri.lastIndexOf("/") + 1);
-  const storageRef = ref(storage, filename); // Create a reference
+  const storageRef = ref(storage, filename);
 
   try {
-    const snapshot = await uploadBytes(storageRef, blob); // Upload the blob
-    const url = await getDownloadURL(snapshot.ref); // Get the download URL
-    return url; // Return the URL of the uploaded file
+    const snapshot = await uploadBytes(storageRef, blob);
+    const url = await getDownloadURL(snapshot.ref);
+    return url;
   } catch (e) {
     console.log("error: ", e);
-    throw e; // It's generally better to throw the error so the caller can handle it
+    throw e;
+  }
+};
+
+export function formatDate(createdAt) {
+  const date = new Date(createdAt);
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    timeZoneName: "short",
+  };
+  return date.toLocaleDateString("en-US", options);
+}
+
+export const getPostLikesText = (likes) => {
+  if (!likes || likes.length === 0) {
+    return " Like";
+  } else if (likes.length === 1) {
+    return " 1 Like";
+  } else {
+    return ` ${likes.length} Likes`;
   }
 };

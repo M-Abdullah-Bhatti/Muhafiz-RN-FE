@@ -1,4 +1,4 @@
-export const API_BASE_URL = "http://192.168.100.22:3001";
+export const API_BASE_URL = "http://192.168.100.35:3001";
 
 export const getApiUrl = (endpoint) => API_BASE_URL + endpoint;
 
@@ -11,6 +11,7 @@ export const CreateGoal = getApiUrl("/goals/create");
 
 // post:
 export const CreatePost = "/post/createPost";
+export const GetAllPostsEndPoint = getApiUrl("/post/allPosts");
 
 // contact:
 export const CreateContact = "/contact/createContact";

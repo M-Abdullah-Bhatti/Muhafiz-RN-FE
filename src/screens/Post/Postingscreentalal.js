@@ -10,8 +10,12 @@ import {
   TextInput,
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { GetAllPosts, GetAllPostsEndPoint } from "../../configs/urls";
-import { GetAllData } from "../../axios/NetworkCalls";
+import {
+  AddLikeOnPost,
+  GetAllPosts,
+  GetAllPostsEndPoint,
+} from "../../configs/urls";
+import { GetAllData, PostData } from "../../axios/NetworkCalls";
 import { formatDate, getPostLikesText } from "../../utils/helpers";
 import { useSelector } from "react-redux";
 import RequestLoader from "../../component/Loader/RequestLoader";
@@ -55,6 +59,29 @@ const Postingscreentalal = () => {
     }, [])
   );
 
+  const handleLikeSubmit = async (postId) => {
+    try {
+      const response = await PostData(`${AddLikeOnPost}/${postId}`);
+
+      if (response?.status) {
+        setData((prevData) =>
+          prevData.map((post) => {
+            if (post?._id === postId) {
+              console.log("response?.data?.likesCount=======");
+              console.log(response?.data?.likesCount);
+              console.log("{ ...post, likes: response?.data?.likesCount }");
+              console.log({ ...post, likes: response?.data?.likesCount });
+              return { ...post, likes: response?.data?.likesCount };
+            }
+            return post;
+          })
+        );
+      }
+    } catch (error) {
+      ShowError(error?.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
@@ -78,8 +105,8 @@ const Postingscreentalal = () => {
       ) : (
         <>
           <ScrollView>
-            {data.map((post, index) => (
-              <View key={index} style={styles.card}>
+            {data.map((post) => (
+              <View key={post?._id} style={styles.card}>
                 <View style={styles.userInfo}>
                   <Image
                     source={require("../../assets/images/otpAvatar.png")}
@@ -99,7 +126,10 @@ const Postingscreentalal = () => {
                   style={styles.userPost}
                 />
                 <View style={styles.interactionWrapper}>
-                  <TouchableOpacity style={styles.interaction}>
+                  <TouchableOpacity
+                    style={styles.interaction}
+                    onPress={() => handleLikeSubmit(post?._id)}
+                  >
                     <FontAwesome
                       name={
                         post.likes &&

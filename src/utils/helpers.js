@@ -33,11 +33,12 @@ export function formatDate(createdAt) {
 }
 
 export const getPostLikesText = (likes) => {
-  if (!likes || likes.length === 0) {
-    return " Like";
-  } else if (likes.length === 1) {
-    return " 1 Like";
+  let likesCount = Array.isArray(likes) ? likes.length : likes;
+  if (!likesCount || likesCount === 0) {
+    return "Like";
+  } else if (likesCount === 1) {
+    return "1 Like";
   } else {
-    return ` ${likes.length} Likes`;
+    return `${likesCount} Likes`;
   }
 };

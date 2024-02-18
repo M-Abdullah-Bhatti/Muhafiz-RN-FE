@@ -15,6 +15,7 @@ export const GetAllPostsEndPoint = getApiUrl("/post/allPosts");
 export const GetAllNotifications = getApiUrl(
   "/notification/getAllNotificationsForUser"
 );
+export const AddLikeOnPost = getApiUrl("/like/addLikesOnPost");
 
 // contact:
 export const CreateContact = "/contact/createContact";

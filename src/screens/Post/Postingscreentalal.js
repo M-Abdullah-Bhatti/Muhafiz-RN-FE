@@ -132,9 +132,9 @@ const Postingscreentalal = () => {
                   >
                     <FontAwesome
                       name={
-                        post.likes &&
-                        post.likes.length > 0 &&
-                        post.likes.some(
+                        post?.likes &&
+                        post?.likes.length > 0 &&
+                        post?.likes.some(
                           (like) => like.user._id === auth.userData.id
                         )
                           ? "heart"

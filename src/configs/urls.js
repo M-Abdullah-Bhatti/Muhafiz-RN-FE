@@ -12,6 +12,9 @@ export const CreateGoal = getApiUrl("/goals/create");
 // post:
 export const CreatePost = "/post/createPost";
 export const GetAllPostsEndPoint = getApiUrl("/post/allPosts");
+export const GetAllNotifications = getApiUrl(
+  "/notification/getAllNotificationsForUser"
+);
 
 // contact:
 export const CreateContact = "/contact/createContact";

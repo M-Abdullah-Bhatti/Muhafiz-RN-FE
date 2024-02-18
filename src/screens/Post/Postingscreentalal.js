@@ -14,6 +14,7 @@ import { GetAllPosts, GetAllPostsEndPoint } from "../../configs/urls";
 import { GetAllData } from "../../axios/NetworkCalls";
 import { formatDate, getPostLikesText } from "../../utils/helpers";
 import { useSelector } from "react-redux";
+import RequestLoader from "../../component/Loader/RequestLoader";
 
 const colors = {
   white: "#FFFFFF",
@@ -39,25 +40,12 @@ const Postingscreentalal = () => {
 
           if (response.success) {
             setData(response?.data);
-
-            // console.log(
-            //   response?.data?.likes?.some(
-            //     (like) => like.user._id === auth.userData.id
-            //   )
-            // );
-
-            console.log(
-              "like: ",
-              response?.data?.likes?.map((item, key) =>
-                console.log("item: ", item)
-              )
-            );
+            setLoading(false);
           } else {
-            setError(response.message);
+            setError(response?.message);
           }
         } catch (err) {
-          console.error("Error fetching data:", err);
-          setError(err.message);
+          setError(err?.message);
         } finally {
           setLoading(false);
         }
@@ -78,92 +66,82 @@ const Postingscreentalal = () => {
           onChangeText={(text) => setSearchValue(text)}
         />
       </View>
-      <ScrollView>
-        {data.map((post, index) => (
-          <View key={index} style={styles.card}>
-            <View style={styles.userInfo}>
-              <Image
-                source={require("../../assets/images/otpAvatar.png")}
-                style={styles.userImage}
-              />
-              <View style={styles.userInfoText}>
-                <Text style={styles.text}>{post?.user?.username}</Text>
-                <Text style={styles.textLite}>
-                  {formatDate(post?.createdAt)}
-                </Text>
-              </View>
-            </View>
-            <Text style={styles.postText}>{post?.description}</Text>
 
-            <Image source={{ uri: post?.imageUrl }} style={styles.userPost} />
-            <View style={styles.interactionWrapper}>
-              {/* <TouchableOpacity
-                style={styles.interaction}
-                // onPress={() => (like === 0 ? setLike(1) : setLike(0))}
-              >
-                <FontAwesome
-                  name={
-                    data?.likes && data?.likes.length === 1
-                      ? "heart"
-                      : "heart-o"
-                  }
-                  color={
-                    data?.likes && data?.likes.length === 0
-                      ? colors.black
-                      : colors.maincolor
-                  }
-                  size={30}
+      {loading ? (
+        <View style={styles.errorContainer}>
+          <RequestLoader size="large" />
+        </View>
+      ) : error ? (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      ) : (
+        <>
+          <ScrollView>
+            {data.map((post, index) => (
+              <View key={index} style={styles.card}>
+                <View style={styles.userInfo}>
+                  <Image
+                    source={require("../../assets/images/otpAvatar.png")}
+                    style={styles.userImage}
+                  />
+                  <View style={styles.userInfoText}>
+                    <Text style={styles.text}>{post?.user?.username}</Text>
+                    <Text style={styles.textLite}>
+                      {formatDate(post?.createdAt)}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.postText}>{post?.description}</Text>
+
+                <Image
+                  source={{ uri: post?.imageUrl }}
+                  style={styles.userPost}
                 />
-                <Text
-                  style={[
-                    styles.interactionText,
-                    data?.likes && data?.likes.length >= 1
-                      ? styles.interactionTextLiked
-                      : null,
-                  ]}
-                >
-                  {data?.likes && data?.likes.length > 1
-                    ? `${data?.likes && data?.likes.length} Likes`
-                    : ` Like`}
-                </Text>
-              </TouchableOpacity> */}
-              <TouchableOpacity style={styles.interaction}>
-                <FontAwesome
-                  name={
-                    post.likes &&
-                    post.likes.length > 0 &&
-                    post.likes.some(
-                      (like) => like.user._id === auth.userData.id
-                    )
-                      ? "heart"
-                      : "heart-o"
-                  }
-                  color={
-                    data?.likes && data?.likes.length === 0
-                      ? colors.black
-                      : colors.maincolor
-                  }
-                  size={30}
-                />
-                <Text
-                  style={[
-                    styles.interactionText,
-                    post?.likes && post.likes.length >= 1
-                      ? styles.interactionTextLiked
-                      : null,
-                  ]}
-                >
-                  {getPostLikesText(post?.likes)}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.interaction}>
-                <FontAwesome name="comment-o" color={colors.black} size={30} />
-                <Text style={styles.interactionText}>Comment</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ))}
-      </ScrollView>
+                <View style={styles.interactionWrapper}>
+                  <TouchableOpacity style={styles.interaction}>
+                    <FontAwesome
+                      name={
+                        post.likes &&
+                        post.likes.length > 0 &&
+                        post.likes.some(
+                          (like) => like.user._id === auth.userData.id
+                        )
+                          ? "heart"
+                          : "heart-o"
+                      }
+                      color={
+                        post?.likes && post?.likes.length === 0
+                          ? colors.black
+                          : colors.maincolor
+                      }
+                      size={30}
+                    />
+                    <Text
+                      style={[
+                        styles.interactionText,
+                        post?.likes && post.likes.length >= 1
+                          ? styles.interactionTextLiked
+                          : null,
+                      ]}
+                    >
+                      {getPostLikesText(post?.likes)}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.interaction}>
+                    <FontAwesome
+                      name="comment-o"
+                      color={colors.black}
+                      size={30}
+                    />
+                    <Text style={styles.interactionText}>Comment</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        </>
+      )}
     </View>
   );
 };
@@ -249,6 +227,27 @@ const styles = StyleSheet.create({
   },
   interactionTextLiked: {
     color: colors.maincolor,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: colors.grey,
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noDataText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: colors.grey,
+    textAlign: "center",
   },
 });
 

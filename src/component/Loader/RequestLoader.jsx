@@ -6,7 +6,7 @@ function RequestLoader({ size }) {
     <View style={styles.centered}>
       <ActivityIndicator
         size={size === "large" ? "large" : "small"}
-        color="yellow"
+        color="blue"
       />
     </View>
   );

@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { GetAllData } from "../../axios/NetworkCalls";
 import { GetAllNotifications } from "../../configs/urls";
 import { formatDate } from "../../utils/helpers";
+import RequestLoader from "../../component/Loader/RequestLoader";
 
 const notifications = [
   {
@@ -159,28 +160,40 @@ const NotificationScreen = () => {
     <View style={styles.container}>
       <Text style={styles.heading}>Notifications</Text>
 
-      <FlatList
-        data={data}
-        keyExtractor={(item) => item?._id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.notificationItem}>
-            <Image
-              source={notifications[0].image}
-              style={styles.notificationImage}
-            />
-            <View style={styles.notificationContent}>
-              <Text style={styles.notificationText}>{`${
-                item?.type === "like"
-                  ? "John liked your post"
-                  : "Jane commented on your photo"
-              }`}</Text>
-              <Text style={styles.notificationTime}>
-                {formatDate(item?.createdAt)}
-              </Text>
-            </View>
-          </View>
-        )}
-      />
+      {loading ? (
+        <View style={styles.errorContainer}>
+          <RequestLoader size="large" />
+        </View>
+      ) : error ? (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      ) : (
+        <>
+          <FlatList
+            data={data}
+            keyExtractor={(item) => item?._id.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.notificationItem}>
+                <Image
+                  source={require("../../assets/images/otpAvatar.png")}
+                  style={styles.notificationImage}
+                />
+                <View style={styles.notificationContent}>
+                  <Text style={styles.notificationText}>{`${
+                    item?.type === "like"
+                      ? `${item?.initiator?.username} liked your post`
+                      : `${item?.initiator?.username} commented on your post`
+                  }`}</Text>
+                  <Text style={styles.notificationTime}>
+                    {formatDate(item?.createdAt)}
+                  </Text>
+                </View>
+              </View>
+            )}
+          />
+        </>
+      )}
     </View>
   );
 };
@@ -218,6 +231,21 @@ const styles = {
   notificationTime: {
     color: "#888",
     marginTop: 4,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "black",
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 };
 

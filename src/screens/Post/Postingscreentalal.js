@@ -283,7 +283,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    padding: 15,
+    paddingTop: 15,
+    paddingBottom: 45,
   },
   searchContainer: {
     flexDirection: "row",

@@ -9,6 +9,7 @@ import {
   Button,
   Image,
   Alert,
+  ScrollView,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
@@ -80,11 +81,11 @@ const PostScreen = () => {
       quality: 1,
     });
     if (!result.cancelled) {
-      console.log("result: ", result);
-      console.log("result: ", result.uri);
+      // console.log("result: ", result);
+      // console.log("result: ", result.uri);
       setCameraUploadingImage(true);
       const image = await uploadImage(result.uri);
-      console.log("image: ", image);
+      // console.log("image: ", image);
       setImage(image);
       setCameraUploadingImage(false);
     }
@@ -167,110 +168,117 @@ const PostScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.backButtonContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={30} color="black" />
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.header}>Create a post</Text>
+    <ScrollView>
+      <View style={styles.container}>
+        <View style={styles.backButtonContainer}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={30} color="black" />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.header}>Create a post</Text>
 
-      <View style={styles.row}>
+        <View style={styles.row}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Date and time of the incident</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={setDate}
+              value={date}
+              placeholder="Select date and time"
+            />
+          </View>
+        </View>
+
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Date and time of the incident</Text>
+          <Text style={styles.label}>What's in your Mind ? ...</Text>
           <TextInput
-            style={styles.input}
-            onChangeText={setDate}
-            value={date}
-            placeholder="Select date and time"
+            style={styles.descriptionInput}
+            onChangeText={setDescription}
+            value={description}
+            placeholder="Describe the incident"
           />
         </View>
-      </View>
+        {image && (
+          <View style={{ width: "100%", height: 110 }}>
+            <Image
+              source={{ uri: image }}
+              style={{
+                width: "100%",
+                height: 110,
+              }}
+              resizeMode="contain"
+            />
+          </View>
+        )}
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>What's in your Mind ? ...</Text>
-        <TextInput
-          style={styles.descriptionInput}
-          onChangeText={setDescription}
-          value={description}
-          placeholder="Describe the incident"
-        />
-      </View>
-      {image && (
-        <View style={{ paddingHorizontal: 15, width: "100%", height: 120 }}>
-          <Image
-            source={{ uri: image }}
+        {location && (
+          <View
             style={{
-              width: "100%",
-              height: 120,
+              marginTop: 20,
+              fontSize: 16,
             }}
-            resizeMode="contain"
-          />
-        </View>
-      )}
+          >
+            <Text>Latitude: {location.coords.latitude}</Text>
+            <Text>Longitude: {location.coords.longitude}</Text>
+          </View>
+        )}
 
-      {location && (
-        <View>
-          <Text>Latitude: {location.coords.latitude}</Text>
-          <Text>Longitude: {location.coords.longitude}</Text>
-        </View>
-      )}
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={[styles.button, styles.flexButton]}
+            onPress={pickMedia}
+          >
+            {uploadingImage ? (
+              <RequestLoader />
+            ) : (
+              <>
+                <Icon name="image" size={20} color="white" />
+                <Text style={styles.buttonText}>Attach Media</Text>
+              </>
+            )}
+          </TouchableOpacity>
 
-      <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={[styles.button, styles.flexButton]}
-          onPress={pickMedia}
-        >
-          {uploadingImage ? (
-            <RequestLoader />
-          ) : (
-            <>
-              <Icon name="image" size={20} color="white" />
-              <Text style={styles.buttonText}>Attach Media</Text>
-            </>
-          )}
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.flexButton]}
+            onPress={pinLocation}
+          >
+            <Icon name="map-pin" size={20} color="white" />
+            <Text style={styles.buttonText}>Pin Location</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.button, styles.flexButton]}
-          onPress={pinLocation}
-        >
-          <Icon name="map-pin" size={20} color="white" />
-          <Text style={styles.buttonText}>Pin Location</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, styles.flexButton]}
-          onPress={openCameraAndUpload}
-        >
-          {cameraUploadingImage ? (
-            <RequestLoader />
-          ) : (
-            <>
-              <Icon name="camera" size={20} color="white" />
-              <Text style={styles.buttonText}>Camera</Text>
-            </>
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity
+          <TouchableOpacity
+            style={[styles.button, styles.flexButton]}
+            onPress={openCameraAndUpload}
+          >
+            {cameraUploadingImage ? (
+              <RequestLoader />
+            ) : (
+              <>
+                <Icon name="camera" size={20} color="white" />
+                <Text style={styles.buttonText}>Camera</Text>
+              </>
+            )}
+          </TouchableOpacity>
+          {/* <TouchableOpacity
           style={[styles.button, styles.flexButton]}
           onPress={pinLocation}
         >
           <Icon name="tag" size={20} color="white" />
           <Text style={styles.buttonText}>Tagging</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        </View>
+
+        <SubmitButton
+          loader={loader}
+          text="Submit"
+          onPress={addPost}
+          buttonColor={color.orange}
+        />
+
+        {/* ... existing FlatList component ... */}
+        <StatusBar style="auto" />
       </View>
-
-      <SubmitButton
-        loader={loader}
-        text="Submit"
-        onPress={addPost}
-        buttonColor={color.orange}
-      />
-
-      {/* ... existing FlatList component ... */}
-      <StatusBar style="auto" />
-    </View>
+    </ScrollView>
   );
 };
 

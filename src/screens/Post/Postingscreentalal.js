@@ -81,9 +81,6 @@ const Postingscreentalal = () => {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
 
-  console.log("data++++++++++++++");
-  console.log(data);
-
   const [showComments, setShowComments] = useState(data.map(() => false));
 
   // Function to toggle comment visibility
@@ -167,6 +164,10 @@ const Postingscreentalal = () => {
     }
   };
 
+  const filteredPosts = data?.filter((post) =>
+    post?.description.toLowerCase().includes(searchValue.toLowerCase())
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
@@ -190,88 +191,94 @@ const Postingscreentalal = () => {
       ) : (
         <>
           <ScrollView>
-            {data.map((post, index) => (
-              <View key={post?._id} style={styles.card}>
-                <View style={styles.userInfo}>
-                  <Image
-                    source={require("../../assets/images/otpAvatar.png")}
-                    style={styles.userImage}
-                  />
-                  <View style={styles.userInfoText}>
-                    <Text style={styles.text}>{post?.user?.username}</Text>
-                    <Text style={styles.textLite}>
-                      {formatDate(post?.createdAt)}
-                    </Text>
+            {filteredPosts.length > 0 ? (
+              filteredPosts.map((post, index) => (
+                <View key={post?._id} style={styles.card}>
+                  <View style={styles.userInfo}>
+                    <Image
+                      source={require("../../assets/images/otpAvatar.png")}
+                      style={styles.userImage}
+                    />
+                    <View style={styles.userInfoText}>
+                      <Text style={styles.text}>{post?.user?.username}</Text>
+                      <Text style={styles.textLite}>
+                        {formatDate(post?.createdAt)}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-                <Text style={styles.postText}>{post?.description}</Text>
+                  <Text style={styles.postText}>{post?.description}</Text>
 
-                <Image
-                  source={{ uri: post?.imageUrl }}
-                  style={styles.userPost}
-                />
-                <View style={styles.interactionWrapper}>
-                  <TouchableOpacity
-                    style={styles.interaction}
-                    onPress={() => handleLikeSubmit(post?._id)}
-                  >
-                    <FontAwesome
-                      name={
-                        post?.likes &&
-                        post?.likes.length > 0 &&
-                        post?.likes.some(
-                          (like) => like.user._id === auth.userData.id
-                        )
-                          ? "heart"
-                          : "heart-o"
-                      }
-                      color={
-                        post?.likes && post?.likes.length === 0
-                          ? colors.black
-                          : colors.maincolor
-                      }
-                      size={30}
-                    />
-                    <Text
-                      style={[
-                        styles.interactionText,
-                        post?.likes && post.likes.length >= 1
-                          ? styles.interactionTextLiked
-                          : null,
-                      ]}
-                    >
-                      {getPostLikesText(post?.likes)}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.interaction}
-                    onPress={() => toggleComments(index)}
-                  >
-                    <FontAwesome
-                      name="comment-o"
-                      color={colors.black}
-                      size={30}
-                    />
-                    <Text style={styles.interactionText}>{`${
-                      post?.comments && post?.comments.length >= 1
-                        ? ` ${post?.comments.length} Comments `
-                        : ` Comment`
-                    }`}</Text>
-                  </TouchableOpacity>
-                </View>
-
-                {/* Conditionally render the comment component */}
-                {showComments[index] && (
-                  <CommentComponent
-                    comments={post?.comments}
-                    toggleComments={() => toggleComments(index)}
-                    onAddComment={(newComment) =>
-                      handleAddCommentToPost(post._id, newComment)
-                    }
+                  <Image
+                    source={{ uri: post?.imageUrl }}
+                    style={styles.userPost}
                   />
-                )}
+                  <View style={styles.interactionWrapper}>
+                    <TouchableOpacity
+                      style={styles.interaction}
+                      onPress={() => handleLikeSubmit(post?._id)}
+                    >
+                      <FontAwesome
+                        name={
+                          post?.likes &&
+                          post?.likes.length > 0 &&
+                          post?.likes.some(
+                            (like) => like.user._id === auth.userData.id
+                          )
+                            ? "heart"
+                            : "heart-o"
+                        }
+                        color={
+                          post?.likes && post?.likes.length === 0
+                            ? colors.black
+                            : colors.maincolor
+                        }
+                        size={30}
+                      />
+                      <Text
+                        style={[
+                          styles.interactionText,
+                          post?.likes && post.likes.length >= 1
+                            ? styles.interactionTextLiked
+                            : null,
+                        ]}
+                      >
+                        {getPostLikesText(post?.likes)}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.interaction}
+                      onPress={() => toggleComments(index)}
+                    >
+                      <FontAwesome
+                        name="comment-o"
+                        color={colors.black}
+                        size={30}
+                      />
+                      <Text style={styles.interactionText}>{`${
+                        post?.comments && post?.comments.length >= 1
+                          ? ` ${post?.comments.length} Comments `
+                          : ` Comment`
+                      }`}</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Conditionally render the comment component */}
+                  {showComments[index] && (
+                    <CommentComponent
+                      comments={post?.comments}
+                      toggleComments={() => toggleComments(index)}
+                      onAddComment={(newComment) =>
+                        handleAddCommentToPost(post._id, newComment)
+                      }
+                    />
+                  )}
+                </View>
+              ))
+            ) : (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>No posts found.</Text>
               </View>
-            ))}
+            )}
           </ScrollView>
         </>
       )}

@@ -114,6 +114,26 @@ const SOSComponent = () => {
             description="SOS Sent"
           />
         </MapView>
+        <View
+          style={{
+            display: "flex",
+            width: "100%",
+            alignItems: "flex-end",
+            marginTop: 20,
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#1E3EB3",
+              paddingVertical: 10,
+              paddingHorizontal: 20,
+              borderRadius: 20,
+            }}
+            onPress={() => navigation.navigate("Incidents")}
+          >
+            <Text style={{ color: "white" }}>All Incidents</Text>
+          </TouchableOpacity>
+        </View>
         {/* Contacts */}
         {loading ? (
           <RequestLoader size="large" />
@@ -157,7 +177,6 @@ const SOSComponent = () => {
             )}
           </>
         )}
-        <AllIncidents />
       </View>
     </ScrollView>
   );

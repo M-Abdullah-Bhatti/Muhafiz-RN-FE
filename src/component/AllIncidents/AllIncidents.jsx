@@ -11,7 +11,7 @@ const AllIncidents = () => {
   const [data, setData] = useState([]);
   const [totalData, setTotalData] = useState(null);
   const [error, setError] = useState(null);
-  const paginate = usePagination(1, 2);
+  const paginate = usePagination(1, 4);
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
 
@@ -35,7 +35,7 @@ const AllIncidents = () => {
           setLoading(true);
 
           const response = await GetAllData(
-            `/incident/getAllMyIncidents?page=${currentPage}&incidentsPerPage=${2}`
+            `/incident/getAllMyIncidents?page=${currentPage}&incidentsPerPage=${4}`
           );
 
           if (response.success) {
@@ -93,7 +93,7 @@ const AllIncidents = () => {
           </View>
 
           {/* Pagination */}
-          {totalData && totalData > 2 && (
+          {totalData && totalData > 4 && (
             <Pagination
               totalPages={totalPages}
               currentPage={currentPage}

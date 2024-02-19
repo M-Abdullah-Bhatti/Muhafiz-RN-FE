@@ -127,10 +127,10 @@ const Postingscreentalal = () => {
         setData((prevData) =>
           prevData.map((post) => {
             if (post?._id === postId) {
-              console.log("response?.data?.likesCount=======");
-              console.log(response?.data?.likesCount);
-              console.log("{ ...post, likes: response?.data?.likesCount }");
-              console.log({ ...post, likes: response?.data?.likesCount });
+              // console.log("response?.data?.likesCount=======");
+              // console.log(response?.data?.likesCount);
+              // console.log("{ ...post, likes: response?.data?.likesCount }");
+              // console.log({ ...post, likes: response?.data?.likesCount });
               return { ...post, likes: response?.data?.likesCount };
             }
             return post;

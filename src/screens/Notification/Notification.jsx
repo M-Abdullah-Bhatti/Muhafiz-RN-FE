@@ -139,7 +139,6 @@ const NotificationScreen = () => {
           );
 
           if (response.success) {
-            console.log(response?.data);
             setData(response?.data);
           } else {
             setError(response.message);

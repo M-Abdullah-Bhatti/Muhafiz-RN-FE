@@ -18,6 +18,8 @@ axiosInstance.interceptors.request.use(async (config) => {
   config.headers["Authorization"] = currentToken
     ? `Bearer ${currentToken}`
     : "";
+  console.log("currentToken");
+  console.log(currentToken);
   return config;
 });
 

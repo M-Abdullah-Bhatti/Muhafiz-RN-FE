@@ -59,10 +59,7 @@ const AllIncidents = () => {
 
   return (
     <View>
-      {loading ? (
-        <RequestLoader size="large" />
-      ) : // </div>
-      error ? (
+      {loading ? null : error ? ( // <RequestLoader size="large" /> // </div>
         <Text>{error}</Text>
       ) : (
         <>
@@ -78,13 +75,20 @@ const AllIncidents = () => {
               All Incidents
             </Text>
             {data.map((item) => (
-              <View style={styles.contact}>
+              <TouchableOpacity
+                style={styles.contact}
+                onPress={() => {
+                  navigation.navigate("CaseAssessment", {
+                    id: item?._id,
+                  });
+                }}
+              >
                 <View style={styles.textContainer}>
                   <Text style={styles.headingg}>{item.name}</Text>
                   <Text style={styles.subheading}>{item.category}</Text>
                   <Text style={styles.subheading}>{item.description}</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
 

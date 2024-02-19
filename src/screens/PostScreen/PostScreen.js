@@ -11,6 +11,7 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
+import { Video } from "expo-av";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -31,17 +32,18 @@ import { uploadImage } from "../../utils/helpers";
 import RequestLoader from "../../component/Loader/RequestLoader";
 
 const PostScreen = () => {
-  const [name, setName] = React.useState("");
+  const video = React.useRef(null);
   const [date, setDate] = React.useState("");
-  const [image, setImage] = React.useState("");
-  const [uploadingImage, setUploadingImage] = React.useState(false);
+  const [mediaType, setMediaType] = useState(null);
+  const [mediaUri, setMediaUri] = useState(null);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const [location, setLocation] = useState(null);
+
   const [cameraUploadingImage, setCameraUploadingImage] = React.useState(false);
   const [loader, setLoader] = React.useState(false);
 
   const [description, setDescription] = React.useState("");
   const navigation = useNavigation();
-  const [posts, setPosts] = useState([]);
-  const [newPost, setNewPost] = useState({ text: "", imageUri: null });
   const auth = useSelector((state) => state.AuthReducer);
 
   const pickMedia = async () => {
@@ -52,18 +54,14 @@ const PostScreen = () => {
       quality: 1,
     });
 
-    // if (!result.cancelled) {
-    //   console.log("resultL ", result);
-    //   setNewPost({ ...newPost, imageUri: result.uri });
-    // }
-    if (!result.cancelled) {
-      console.log("result: ", result);
-      console.log("result: ", result.uri);
-      setUploadingImage(true);
+    if (!result.canceled) {
+      setUploadingMedia(true);
+      setMediaType(result.type); // 'image' or 'video'
+
       const image = await uploadImage(result.uri);
-      console.log("image: ", image);
-      setImage(image);
-      setUploadingImage(false);
+
+      setMediaUri(image);
+      setUploadingMedia(false);
     }
   };
 
@@ -80,13 +78,11 @@ const PostScreen = () => {
       aspect: [4, 3],
       quality: 1,
     });
-    if (!result.cancelled) {
-      // console.log("result: ", result);
-      // console.log("result: ", result.uri);
+    if (!result.canceled) {
       setCameraUploadingImage(true);
       const image = await uploadImage(result.uri);
-      // console.log("image: ", image);
-      setImage(image);
+
+      setUploadingMedia(image);
       setCameraUploadingImage(false);
     }
   };
@@ -97,7 +93,8 @@ const PostScreen = () => {
       dateAndTime: date,
       description: description,
       user: auth.userData.id,
-      imageUrl: image || "",
+      imageUrl: mediaUri || "",
+      imageType: mediaType || "",
       latitude: location?.coords.latitude || "",
       longitude: location?.coords.longitude || "",
     };
@@ -117,7 +114,7 @@ const PostScreen = () => {
               onPress: () => {
                 setDate("");
                 setDescription("");
-                setImage("");
+                setMediaUri("");
                 setLocation("");
               },
             },
@@ -136,26 +133,6 @@ const PostScreen = () => {
     }
   };
 
-  const likePost = (id) => {
-    setPosts(
-      posts.map((post) =>
-        post.id === id ? { ...post, likes: post.likes + 1 } : post
-      )
-    );
-  };
-
-  const addComment = (id, comment) => {
-    setPosts(
-      posts.map((post) =>
-        post.id === id
-          ? { ...post, comments: [...post.comments, comment] }
-          : post
-      )
-    );
-  };
-
-  const [location, setLocation] = useState(null);
-
   async function pinLocation() {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
@@ -166,6 +143,37 @@ const PostScreen = () => {
     console.log("location: ", location);
     setLocation(location);
   }
+
+  const renderMedia = () => {
+    if (mediaType === "image") {
+      return (
+        <Image
+          source={{ uri: mediaUri }}
+          style={{ width: "100%", height: 120 }}
+          resizeMode="contain"
+        />
+      );
+    } else if (mediaType === "video") {
+      return (
+        <Video
+          ref={video}
+          // source={{ uri: mediaUri }}
+          source={{
+            uri: "https://firebasestorage.googleapis.com/v0/b/muhafiz-adddb.appspot.com/o/73aaf3e5-b3b2-40a2-adae-c0a11eb43b3d.mp4?alt=media&token=9b711eb8-32ab-4608-b7a1-e1e568b1f01c",
+          }}
+          // rate={1.0}
+          // volume={1.0}
+          isMuted={false}
+          resizeMode="cover"
+          shouldPlay={false}
+          isLooping
+          style={{ width: "100%", height: 120 }}
+          useNativeControls // Use native controls
+        />
+      );
+    }
+    return null;
+  };
 
   return (
     <ScrollView>
@@ -198,17 +206,9 @@ const PostScreen = () => {
             placeholder="Describe the incident"
           />
         </View>
-        {image && (
-          <View style={{ width: "100%", height: 110 }}>
-            <Image
-              source={{ uri: image }}
-              style={{
-                width: "100%",
-                height: 110,
-              }}
-              resizeMode="contain"
-            />
-          </View>
+
+        {mediaUri && (
+          <View style={{ width: "100%", height: 120 }}>{renderMedia()}</View>
         )}
 
         {location && (
@@ -228,7 +228,7 @@ const PostScreen = () => {
             style={[styles.button, styles.flexButton]}
             onPress={pickMedia}
           >
-            {uploadingImage ? (
+            {uploadingMedia ? (
               <RequestLoader />
             ) : (
               <>

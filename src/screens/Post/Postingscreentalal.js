@@ -20,6 +20,7 @@ import { GetAllData, PostData } from "../../axios/NetworkCalls";
 import { formatDate, getPostLikesText } from "../../utils/helpers";
 import { useSelector } from "react-redux";
 import RequestLoader from "../../component/Loader/RequestLoader";
+import { Video } from "expo-av";
 
 const colors = {
   white: "#FFFFFF",
@@ -74,6 +75,7 @@ const CommentComponent = ({ comments, onAddComment, toggleComments }) => {
 };
 
 const Postingscreentalal = () => {
+  const video = React.useRef(null);
   const auth = useSelector((state) => state.AuthReducer);
   const [searchValue, setSearchValue] = useState("");
 
@@ -124,10 +126,6 @@ const Postingscreentalal = () => {
         setData((prevData) =>
           prevData.map((post) => {
             if (post?._id === postId) {
-              // console.log("response?.data?.likesCount=======");
-              // console.log(response?.data?.likesCount);
-              // console.log("{ ...post, likes: response?.data?.likesCount }");
-              // console.log({ ...post, likes: response?.data?.likesCount });
               return { ...post, likes: response?.data?.likesCount };
             }
             return post;
@@ -167,6 +165,28 @@ const Postingscreentalal = () => {
   const filteredPosts = data?.filter((post) =>
     post?.description.toLowerCase().includes(searchValue.toLowerCase())
   );
+
+  const renderMedia = (mediaType, mediaUri) => {
+    switch (mediaType) {
+      case "image":
+        return <Image source={{ uri: mediaUri }} style={styles.userPost} />;
+      case "video":
+        return (
+          <Video
+            ref={video}
+            source={{ uri: mediaUri }}
+            isMuted={false}
+            resizeMode="cover"
+            shouldPlay={false}
+            isLooping
+            style={styles.userPost}
+            useNativeControls // Use native controls
+          />
+        );
+      default:
+        return null; // Or some placeholder if no mediaType is provided
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -208,10 +228,13 @@ const Postingscreentalal = () => {
                   </View>
                   <Text style={styles.postText}>{post?.description}</Text>
 
-                  <Image
+                  {/* <Image
                     source={{ uri: post?.imageUrl }}
                     style={styles.userPost}
-                  />
+                  /> */}
+
+                  {renderMedia(post?.imageType, post?.imageUrl)}
+
                   <View style={styles.interactionWrapper}>
                     <TouchableOpacity
                       style={styles.interaction}

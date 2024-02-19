@@ -73,16 +73,19 @@ const PostScreen = () => {
     }
     // Open the camera
     let result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
+
     if (!result.canceled) {
       setCameraUploadingImage(true);
+      setMediaType(result.type); // 'image' or 'video'
+
       const image = await uploadImage(result.uri);
 
-      setUploadingMedia(image);
+      setMediaUri(image);
       setCameraUploadingImage(false);
     }
   };
@@ -259,13 +262,6 @@ const PostScreen = () => {
               </>
             )}
           </TouchableOpacity>
-          {/* <TouchableOpacity
-          style={[styles.button, styles.flexButton]}
-          onPress={pinLocation}
-        >
-          <Icon name="tag" size={20} color="white" />
-          <Text style={styles.buttonText}>Tagging</Text>
-        </TouchableOpacity> */}
         </View>
 
         <SubmitButton
@@ -275,7 +271,6 @@ const PostScreen = () => {
           buttonColor={color.orange}
         />
 
-        {/* ... existing FlatList component ... */}
         <StatusBar style="auto" />
       </View>
     </ScrollView>

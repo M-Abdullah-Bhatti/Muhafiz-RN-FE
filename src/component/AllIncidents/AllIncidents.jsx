@@ -59,7 +59,9 @@ const AllIncidents = () => {
 
   return (
     <View>
-      {loading ? null : error ? ( // <RequestLoader size="large" /> // </div>
+      {loading ? (
+        <RequestLoader size="large" />
+      ) : error ? ( // <RequestLoader size="large" /> // </div>
         <Text>{error}</Text>
       ) : (
         <>

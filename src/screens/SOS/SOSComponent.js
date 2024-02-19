@@ -138,7 +138,7 @@ const SOSComponent = () => {
         {loading ? (
           <RequestLoader size="large" />
         ) : // </div>
-        data.length === 0 ? (
+        error ? (
           <Text>{error}</Text>
         ) : (
           <>

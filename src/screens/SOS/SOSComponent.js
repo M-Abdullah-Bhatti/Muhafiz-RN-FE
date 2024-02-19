@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Linking } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Linking,
+  ScrollView,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import MapView, { Marker } from "react-native-maps";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -8,6 +14,7 @@ import usePagination from "../../utils/usePagination";
 import Pagination from "../../component/Shared/Pagination";
 import RequestLoader from "../../component/Loader/RequestLoader";
 import Header from "../../component/Header";
+import AllIncidents from "../../component/AllIncidents/AllIncidents";
 
 const SOSComponent = () => {
   const paginate = usePagination(1, 2);
@@ -23,13 +30,13 @@ const SOSComponent = () => {
     totalData
   );
 
-  console.log(
-    "currentPage, totalPages, pageNumbersToShow: ",
-    currentPage,
-    totalPages,
+  // console.log(
+  //   "currentPage, totalPages, pageNumbersToShow: ",
+  //   currentPage,
+  //   totalPages,
 
-    pageNumbersToShow
-  );
+  //   pageNumbersToShow
+  // );
 
   const navigateTonewContact = () => {
     navigation.navigate("NewContact"); // Ensure 'MapWithButtons' is the name of your target screen
@@ -58,7 +65,7 @@ const SOSComponent = () => {
           );
 
           if (response.success) {
-            console.log(response?.data);
+            // console.log(response?.data);
             setData(response?.data?.contacts);
             setTotalData(response?.data?.totalContacts);
           } else {
@@ -77,88 +84,95 @@ const SOSComponent = () => {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Send SOS Heading on the top left */}
-      <Header screen={"Home"} />
+    <ScrollView style={styles.scrollViewStyle}>
+      <View style={styles.container}>
+        {/* Send SOS Heading on the top left */}
+        <Header screen={"Home"} />
 
-      <Text style={styles.heading}>Send SOS</Text>
-      <Text style={styles.subHeadingPlease}>Please Stay Calm</Text>
+        <Text style={styles.heading}>Send SOS</Text>
+        <Text style={styles.subHeadingPlease}>Please Stay Calm</Text>
 
-      {/* Icon on the top right */}
-      <TouchableOpacity onPress={navigateTonewContact} style={styles.icon}>
-        <Ionicons name="person-add-outline" size={30} color="black" />
-      </TouchableOpacity>
+        {/* Icon on the top right */}
+        <TouchableOpacity onPress={navigateTonewContact} style={styles.icon}>
+          <Ionicons name="person-add-outline" size={30} color="black" />
+        </TouchableOpacity>
 
-      {/* Map */}
-      <MapView
-        style={styles.map}
-        initialRegion={{
-          latitude: 37.78825, // Replace with the actual latitude of your location
-          longitude: -122.4324, // Replace with the actual longitude of your location
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
-      >
-        {/* Marker for the map */}
-        <Marker
-          coordinate={{ latitude: 37.78825, longitude: -122.4324 }} // Replace with the actual coordinates of your location
-          title="Your Location"
-          description="SOS Sent"
-        />
-      </MapView>
-      {/* Contacts */}
-      {loading ? (
-        <RequestLoader size="large" />
-      ) : // </div>
-      data.length === 0 ? (
-        <Text>{error}</Text>
-      ) : (
-        <>
-          <View style={styles.contactContainer}>
-            {data.map((item) => (
-              <View style={styles.contact}>
-                <View style={styles.textContainer}>
-                  <Text style={styles.headingg}>{item.name}</Text>
-                  <Text style={styles.subheading}>{item.address}</Text>
+        {/* Map */}
+        <MapView
+          style={styles.map}
+          initialRegion={{
+            latitude: 37.78825, // Replace with the actual latitude of your location
+            longitude: -122.4324, // Replace with the actual longitude of your location
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        >
+          {/* Marker for the map */}
+          <Marker
+            coordinate={{ latitude: 37.78825, longitude: -122.4324 }} // Replace with the actual coordinates of your location
+            title="Your Location"
+            description="SOS Sent"
+          />
+        </MapView>
+        {/* Contacts */}
+        {loading ? (
+          <RequestLoader size="large" />
+        ) : // </div>
+        data.length === 0 ? (
+          <Text>{error}</Text>
+        ) : (
+          <>
+            <View style={styles.contactContainer}>
+              <Text style={{ fontSize: 22, marginTop: 10, fontWeight: "600" }}>
+                All Contacts
+              </Text>
+              {data.map((item) => (
+                <View style={styles.contact}>
+                  <View style={styles.textContainer}>
+                    <Text style={styles.headingg}>{item.name}</Text>
+                    <Text style={styles.subheading}>{item.address}</Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => makePhoneCall(item.phoneNumber)}
+                  >
+                    <Ionicons
+                      name="ios-call"
+                      size={24}
+                      color="grey"
+                      style={styles.phoneIcon}
+                    />
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                  onPress={() => makePhoneCall(item.phoneNumber)}
-                >
-                  <Ionicons
-                    name="ios-call"
-                    size={24}
-                    color="grey"
-                    style={styles.phoneIcon}
-                  />
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
+              ))}
+            </View>
 
-          {/* Pagination */}
-          {totalData && totalData > 2 && (
-            <Pagination
-              totalPages={totalPages}
-              currentPage={currentPage}
-              onPageChange={goToPage}
-              pageNumbersToShow={pageNumbersToShow}
-            />
-          )}
-        </>
-      )}
-    </View>
+            {/* Pagination */}
+            {totalData && totalData > 2 && (
+              <Pagination
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={goToPage}
+                pageNumbersToShow={pageNumbersToShow}
+              />
+            )}
+          </>
+        )}
+        <AllIncidents />
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = {
-  container: {
-    flex: 1,
+  scrollViewStyle: {
     backgroundColor: "#fff",
+  },
+  container: {
     alignItems: "center",
     justifyContent: "flex-start",
     padding: 16,
-    marginBottom: 20,
-    marginTop: 0,
+    width: "100%",
+    marginBottom: 60,
   },
   heading: {
     fontSize: 24,
@@ -172,7 +186,7 @@ const styles = {
     fontSize: 20,
     color: "#008000",
     fontWeight: "bold",
-    marginTop: 20,
+    marginTop: 10,
     marginBottom: 20,
     alignSelf: "flex-start",
   },
@@ -206,7 +220,7 @@ const styles = {
   },
   headingg: {
     fontSize: 20,
-    marginTop: 40,
+    marginTop: 10,
     color: "#1E3EB3",
     marginBottom: 20,
     alignSelf: "flex-start",

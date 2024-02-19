@@ -19,7 +19,7 @@ const contactValidation = (data) => {
   if (!validator.email(data.email)) {
     return "Enter a Valid Email";
   }
-  if (checkMinLength(data.name, 8)) {
+  if (checkMinLength(data.name, 4)) {
     return "Username should be of atleast 8 Character";
   }
 };

@@ -228,7 +228,13 @@ const Postingscreentalal = () => {
                         </Text>
                       </View>
                     </View>
-                    {post?.user._id === auth.userData.id && <ThreeDotsMenu />}
+                    {post?.user._id === auth.userData.id && (
+                      <ThreeDotsMenu
+                        postId={post?._id}
+                        setData={setData}
+                        data={data}
+                      />
+                    )}
                   </View>
                   <Text style={styles.postText}>{post?.description}</Text>
 

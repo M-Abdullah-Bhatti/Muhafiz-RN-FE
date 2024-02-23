@@ -1,29 +1,63 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { DeleteSingleData } from "../../axios/NetworkCalls";
+import { ShowError } from "../../utils/flashMessages";
+import RequestLoader from "../Loader/RequestLoader";
 
-const ThreeDotsMenu = () => {
+const ThreeDotsMenu = ({ postId, setData, data }) => {
   const [showDeleteOption, setShowDeleteOption] = useState(false);
+  const [Loader, setLoader] = useState(false);
 
   const toggleDeleteOption = () => {
     setShowDeleteOption(!showDeleteOption);
+  };
+
+  const handleDelete = async () => {
+    setLoader(true);
+    try {
+      const response = await DeleteSingleData(`/post/deletePost/${postId}`);
+
+      if (response?.status) {
+        setLoader(false);
+        toggleDeleteOption();
+        Alert.alert("SUCCESS", response?.message, [
+          {
+            text: "Close",
+            onPress: () => {
+              console.log("post delete successfully");
+              const fileteredData = data.filter((item) => item._id != postId);
+              setData(fileteredData);
+            },
+          },
+        ]);
+      } else {
+        ShowError(response);
+        toggleDeleteOption();
+      }
+    } catch (err) {
+      ShowError(err.message);
+    } finally {
+      setLoader(false);
+      toggleDeleteOption();
+    }
   };
 
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={toggleDeleteOption}>
         <View style={styles.menuContainer}>
-          <View style={styles.dot}></View>
-          <View style={styles.dot}></View>
+          {/* Adjusted for horizontal layout with marginRight for spacing */}
+          <View style={[styles.dot, styles.dotSpacing]}></View>
+          <View style={[styles.dot, styles.dotSpacing]}></View>
           <View style={styles.dot}></View>
         </View>
       </TouchableOpacity>
 
       {showDeleteOption && (
-        <TouchableOpacity
-          onPress={toggleDeleteOption}
-          style={styles.deleteOption}
-        >
-          <Text style={styles.deleteText}>Delete your post</Text>
+        <TouchableOpacity onPress={handleDelete} style={styles.deleteOption}>
+          <Text style={styles.deleteText}>
+            {Loader ? <RequestLoader /> : "Delete"}
+          </Text>
         </TouchableOpacity>
       )}
     </View>
@@ -36,31 +70,30 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   menuContainer: {
-    flexDirection: "column",
-    justifyContent: "space-between",
-    gap: 4,
-    padding: 2,
+    flexDirection: "row", // Arrange dots horizontally
+    padding: 10, // Padding around the dots for easier tapping
   },
   dot: {
-    width: 4,
-    height: 4,
-    borderRadius: 3,
+    width: 6, // Slightly larger dots for better visibility
+    height: 6,
+    borderRadius: 3, // Fully rounded dots
     backgroundColor: "#000",
+    marginLeft: 4, // Space between dots
   },
   deleteOption: {
+    width: 60,
     position: "absolute",
-    right: 20,
+    top: 30, // Position below the dots
+    right: 0, // Align with the end of the container
     backgroundColor: "#fff",
-    flexDirection: "row", // Align text horizontally
-    padding: 10,
+    padding: 8,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: "#000",
-    zIndex: 30,
+    borderColor: "#ddd", // Lighter border color
+    zIndex: 30, // Ensure it's above other elements
   },
   deleteText: {
-    color: "#000", // Set text color to black
-    marginLeft: 5, // Add some space between dot and text
+    color: "#000",
   },
 });
 

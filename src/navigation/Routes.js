@@ -14,6 +14,7 @@ import CrimeTracking from "../screens/CrimeTracking/CrimeTracking";
 import NewContact from "../screens/NewContact/NewContact";
 import ConnectWithAuth from "../screens/Connectwithauth/ConnectWithAuth";
 import Incidents from "../screens/Incidents/Incidents";
+import EditProfile from "../screens/EditProfile/EditProfile";
 
 const Stack = createNativeStackNavigator();
 
@@ -48,6 +49,7 @@ function Routes() {
         <Stack.Screen name="NewContact" component={NewContact} />
         <Stack.Screen name="ConnectWithAuth" component={ConnectWithAuth} />
         <Stack.Screen name="Incidents" component={Incidents} />
+        <Stack.Screen name="EditProfile" component={EditProfile} />
       </Stack.Navigator>
     </NavigationContainer>
   );

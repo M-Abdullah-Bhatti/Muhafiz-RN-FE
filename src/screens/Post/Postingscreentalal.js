@@ -21,6 +21,7 @@ import { formatDate, getPostLikesText } from "../../utils/helpers";
 import { useSelector } from "react-redux";
 import RequestLoader from "../../component/Loader/RequestLoader";
 import { Video } from "expo-av";
+import ThreeDotsMenu from "../../component/Shared/ThreeDotsMenu";
 
 const colors = {
   white: "#FFFFFF",
@@ -215,16 +216,19 @@ const Postingscreentalal = () => {
               filteredPosts.map((post, index) => (
                 <View key={post?._id} style={styles.card}>
                   <View style={styles.userInfo}>
-                    <Image
-                      source={require("../../assets/images/otpAvatar.png")}
-                      style={styles.userImage}
-                    />
-                    <View style={styles.userInfoText}>
-                      <Text style={styles.text}>{post?.user?.username}</Text>
-                      <Text style={styles.textLite}>
-                        {formatDate(post?.createdAt)}
-                      </Text>
+                    <View style={styles.userInfoLeft}>
+                      <Image
+                        source={require("../../assets/images/otpAvatar.png")}
+                        style={styles.userImage}
+                      />
+                      <View style={styles.userInfoText}>
+                        <Text style={styles.text}>{post?.user?.username}</Text>
+                        <Text style={styles.textLite}>
+                          {formatDate(post?.createdAt)}
+                        </Text>
+                      </View>
                     </View>
+                    {post?.user._id === auth.userData.id && <ThreeDotsMenu />}
                   </View>
                   <Text style={styles.postText}>{post?.description}</Text>
 
@@ -342,6 +346,14 @@ const styles = StyleSheet.create({
   },
   userInfo: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingRight: 10,
+  },
+  userInfoLeft: {
+    flexDirection: "row",
+    justifyContent: "start",
+    alignItems: "center",
   },
   userImage: {
     width: 50,

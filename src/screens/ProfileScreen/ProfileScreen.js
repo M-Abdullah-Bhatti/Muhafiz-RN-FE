@@ -1,6 +1,7 @@
 import { useNavigation } from "@react-navigation/core";
 import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import Header from "../../component/Header";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -48,16 +49,26 @@ const ProfileScreen = () => {
         {/* Links */}
         <View style={styles.linksContainer}>
           {/* Link 1 */}
-          <View style={styles.linkItem}>
+          <TouchableOpacity
+            style={styles.linkItem}
+            onPress={() => navigation.navigate("Incidents")}
+          >
             <Text>All Incidents</Text>
             {/* Right Arrow Icon */}
             <Image source={require("../../assets/images/right-arrow.png")} />
-          </View>
+          </TouchableOpacity>
           {/* Link 2 */}
-          <View style={styles.linkItem}>
-            <Text>All Posts</Text>
+          <TouchableOpacity
+            style={styles.linkItem}
+            onPress={() => navigation.navigate("AllContacts")}
+          >
+            <Text>All Contacts</Text>
             {/* Right Arrow Icon */}
             <Image source={require("../../assets/images/right-arrow.png")} />
+          </TouchableOpacity>
+
+          <View style={{ marginTop: 50 }}>
+            <Header screen={"Home"} />
           </View>
         </View>
       </View>

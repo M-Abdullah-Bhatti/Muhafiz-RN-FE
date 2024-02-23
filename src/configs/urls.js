@@ -1,4 +1,4 @@
-export const API_BASE_URL = "http://192.168.100.36:3001";
+export const API_BASE_URL = "http://192.168.100.22:3001";
 
 export const getApiUrl = (endpoint) => API_BASE_URL + endpoint;
 
@@ -8,6 +8,7 @@ export const sendEmail = getApiUrl("/users/sendemail");
 export const VerifyOtp = getApiUrl("/users/verifyOtp");
 export const UpdatePassword = getApiUrl("/users/updatePassword");
 export const CreateGoal = getApiUrl("/goals/create");
+export const UpdateUser = "/users/updateUser";
 
 // post:
 export const CreatePost = "/post/createPost";

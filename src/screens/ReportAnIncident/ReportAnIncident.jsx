@@ -128,7 +128,7 @@ const ReportAnIncident = ({ route }) => {
             onChangeText={setDescription}
             value={description}
             placeholder="Describe the incident"
-            multiline
+            
           />
         </View>
 

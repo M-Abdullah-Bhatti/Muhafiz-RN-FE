@@ -90,7 +90,7 @@ const ImageContainer = ({
 
 const HeaderTitle = ({ name }) => (
   <View style={styles.title}>
-    <Text style={styles.bigTitle}>Hi, TBN {name}</Text>
+    <Text style={styles.bigTitle}>Hi,  {name}</Text>
     <Text style={styles.smallTitle}>{Date()}</Text>
   </View>
 );

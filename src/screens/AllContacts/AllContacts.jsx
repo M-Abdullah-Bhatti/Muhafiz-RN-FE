@@ -86,6 +86,11 @@ const AllContacts = () => {
   return (
     <ScrollView style={styles.scrollViewStyle}>
       <View style={styles.container}>
+      <View style={styles.backButtonContainer}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={30} color="black" />
+          </TouchableOpacity>
+        </View>
         <Text style={styles.heading}>Send SOS</Text>
         <Text style={styles.subHeadingPlease}>Please Stay Calm</Text>
 
@@ -168,6 +173,11 @@ const styles = {
     marginTop: 10,
     marginBottom: 20,
     alignSelf: "flex-start",
+  },
+  backButtonContainer: {
+    top: 40, // Adjust top and left values as needed
+    marginBottom: 20,
+    right: 150,
   },
   icon: {
     position: "absolute",

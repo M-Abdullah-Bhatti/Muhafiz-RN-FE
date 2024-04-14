@@ -33,11 +33,12 @@ const InputAutoComplete = ({ placeholder, onPlaceSelected }) => {
   return (
     <>
       <GooglePlacesAutocomplete
+        key={`input-${placeholder}`}
         styles={{ textInput: styles.input }}
         placeholder={placeholder || ""}
         fetchDetails={true}
         onPress={(data, details = null) => {
-          console.log("Autocomplete onPress triggered", details);
+          // console.log("Autocomplete onPress triggered", details);
           onPlaceSelected(details);
         }}
         // onPress={(data, details = null) => console.log(data, details)}
@@ -62,6 +63,17 @@ const CrimeTracking = () => {
   const [duration, setDuration] = useState(0);
   const mapRef = useRef(null);
 
+  // ==============
+
+  const edgePaddingValue = 70;
+
+  const edgePadding = {
+    top: edgePaddingValue,
+    right: edgePaddingValue,
+    bottom: edgePaddingValue,
+    left: edgePaddingValue,
+  };
+
   const moveTo = async (position) => {
     const camera = await mapRef.current?.getCamera();
     if (camera) {
@@ -71,8 +83,6 @@ const CrimeTracking = () => {
   };
 
   const traceRouteOnReady = (args) => {
-    console.log("args");
-    console.log(args);
     if (args) {
       // args.distance
       // args.duration
@@ -84,13 +94,16 @@ const CrimeTracking = () => {
   const traceRoute = () => {
     if (origin && destination) {
       setShowDirections(true);
-      mapRef.current?.fitToCoordinates([origin, destination]);
+      mapRef.current?.fitToCoordinates([origin, destination], { edgePadding });
     }
   };
 
   const onPlaceSelected = (details, flag) => {
-    console.log("onPlaceSelected");
+    // console.log("details===========");
+    // console.log(details);
+
     const set = flag === "origin" ? setOrigin : setDestination;
+
     const position = {
       latitude: details?.geometry.location.lat || 0,
       longitude: details?.geometry.location.lng || 0,
@@ -125,24 +138,27 @@ const CrimeTracking = () => {
     <View style={styles.container}>
       <MapView
         style={styles.map}
-        showsUserLocation={true}
+        // showsUserLocation={true}
         provider={PROVIDER_GOOGLE}
         initialRegion={INITIAL_POSITION}
         ref={mapRef}
-      />
-
-      {origin && <Marker coordinate={origin} />}
-      {destination && <Marker coordinate={destination} />}
-      {showDirections && origin && destination && (
-        <MapViewDirections
-          origin={origin}
-          destination={destination}
-          apikey="AIzaSyBKX6FzffGaFn0xkKbx_jyRDN1UDPXzy30"
-          strokeColor="#6644ff"
-          strokeWidth={4}
-          onReady={traceRouteOnReady}
-        />
-      )}
+      >
+        {origin && <Marker coordinate={origin} pinColor={"green"} />}
+        {destination && <Marker coordinate={destination} pinColor={"green"} />}
+        {showDirections && (
+          <MapViewDirections
+            origin={origin}
+            destination={destination}
+            apikey="AIzaSyBKX6FzffGaFn0xkKbx_jyRDN1UDPXzy30"
+            strokeWidth={4}
+            strokeColor="#ff0000" // Set the color to red
+            onReady={traceRouteOnReady}
+            onError={(errorMessage) => {
+              console.error("GOT AN ERROR", errorMessage);
+            }}
+          />
+        )}
+      </MapView>
 
       <View style={styles.backButtonContainer}>
         <TouchableOpacity onPress={() => navigation.goBack()}>

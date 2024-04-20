@@ -1,5 +1,5 @@
 // PostScreen.js
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,42 +9,61 @@ import {
   Button,
   Image,
   Alert,
-  ScrollView,
 } from "react-native";
+import { ScrollView } from "react-native-virtualized-view";
 import { Video } from "expo-av";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/FontAwesome";
-import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import color from "../../styles/color";
 import SubmitButton from "../../component/ButtonSubmit";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import postValidation from "../../utils/validations/postValidation";
 import { ShowError } from "../../utils/flashMessages";
 import { useSelector } from "react-redux";
-import jwtDecode from "jwt-decode";
 import { PostData } from "../../axios/NetworkCalls";
 import { CreatePost } from "../../configs/urls";
-import axiosInstance from "../../axios";
 import { uploadImage } from "../../utils/helpers";
 import RequestLoader from "../../component/Loader/RequestLoader";
+import InputAutoComplete from "../../component/Shared/InputAutoComplete";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const PostScreen = () => {
   const video = React.useRef(null);
-  const [date, setDate] = React.useState("");
+  const navigation = useNavigation();
+  const auth = useSelector((state) => state.AuthReducer);
+
+  const [loader, setLoader] = React.useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const [date, setDate] = React.useState(new Date());
   const [mediaType, setMediaType] = useState(null);
   const [mediaUri, setMediaUri] = useState(null);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [location, setLocation] = useState(null);
 
   const [cameraUploadingImage, setCameraUploadingImage] = React.useState(false);
-  const [loader, setLoader] = React.useState(false);
-
   const [description, setDescription] = React.useState("");
-  const navigation = useNavigation();
-  const auth = useSelector((state) => state.AuthReducer);
+
+  const onPlaceSelected = (details) => {
+    console.log("Place selected:", details);
+
+    if (details && details.geometry && details.geometry.location) {
+      const position = {
+        latitude: details.geometry.location.lat || 0,
+        longitude: details.geometry.location.lng || 0,
+      };
+      console.log("Location position:", position);
+      setLocation(position);
+    } else {
+      console.log("No location details found");
+    }
+  };
+
+  const toggleDatePicker = () => {
+    setShowDatePicker((prev) => !prev);
+  };
 
   const pickMedia = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -136,17 +155,6 @@ const PostScreen = () => {
     }
   };
 
-  async function pinLocation() {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission to access location was denied");
-      return;
-    }
-    let location = await Location.getCurrentPositionAsync({});
-    console.log("location: ", location);
-    setLocation(location);
-  }
-
   const renderMedia = () => {
     if (mediaType === "image") {
       return (
@@ -160,10 +168,10 @@ const PostScreen = () => {
       return (
         <Video
           ref={video}
-          // source={{ uri: mediaUri }}
-          source={{
-            uri: "https://firebasestorage.googleapis.com/v0/b/muhafiz-adddb.appspot.com/o/73aaf3e5-b3b2-40a2-adae-c0a11eb43b3d.mp4?alt=media&token=9b711eb8-32ab-4608-b7a1-e1e568b1f01c",
-          }}
+          source={{ uri: mediaUri }}
+          // source={{
+          //   uri: "https://firebasestorage.googleapis.com/v0/b/muhafiz-adddb.appspot.com/o/73aaf3e5-b3b2-40a2-adae-c0a11eb43b3d.mp4?alt=media&token=9b711eb8-32ab-4608-b7a1-e1e568b1f01c",
+          // }}
           // rate={1.0}
           // volume={1.0}
           isMuted={false}
@@ -191,16 +199,54 @@ const PostScreen = () => {
         <View style={styles.row}>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Date and time of the incident</Text>
-            <TextInput
-              style={styles.input}
-              onChangeText={setDate}
-              value={date}
-              placeholder="Select date and time"
-            />
+            <TouchableOpacity
+              onPress={toggleDatePicker}
+              style={{
+                flex: 1,
+              }}
+            >
+              <Text style={styles.input}>
+                {date ? date.toLocaleString() : "Select date and time"}
+              </Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date}
+                mode="datetime"
+                is24Hour={false}
+                onChange={(event, selectedDate) => {
+                  console.log("selectedDate");
+                  console.log(selectedDate);
+                  setShowDatePicker(false);
+                  setDate(selectedDate || date);
+                }}
+              />
+            )}
           </View>
         </View>
 
-        <View style={styles.inputGroup}>
+        <ScrollView
+          contentContainerStyle={{}}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.label}>Search Crime location </Text>
+
+          <InputAutoComplete
+            placeholder="Search..."
+            styling={{
+              backgroundColor: "#f0f0f0",
+              // borderRadius: 8,
+              // padding: 16,
+              // flex: 1,
+            }}
+            onPlaceSelected={(details) => {
+              onPlaceSelected(details);
+            }}
+          />
+        </ScrollView>
+
+        <View style={{ ...styles.inputGroup, marginTop: 16 }}>
           <Text style={styles.label}>What's in your Mind ? ...</Text>
           <TextInput
             style={styles.descriptionInput}
@@ -241,13 +287,13 @@ const PostScreen = () => {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={[styles.button, styles.flexButton]}
             onPress={pinLocation}
           >
             <Icon name="map-pin" size={20} color="white" />
             <Text style={styles.buttonText}>Pin Location</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <TouchableOpacity
             style={[styles.button, styles.flexButton]}
@@ -321,10 +367,13 @@ const styles = StyleSheet.create({
   },
   inputGroup: {
     marginBottom: 16,
+
+    flex: 1,
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
+    // flex: 1,
   },
   label: {
     fontSize: 16,
@@ -335,6 +384,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
     borderRadius: 8,
     padding: 16,
+    flex: 1,
+
     fontSize: 16,
   },
   descriptionInput: {

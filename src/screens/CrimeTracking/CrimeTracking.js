@@ -14,8 +14,8 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { useNavigation } from "@react-navigation/native";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import MapViewDirections from "react-native-maps-directions";
+import InputAutoComplete from "../../component/Shared/InputAutoComplete";
 
 const { width, height } = Dimensions.get("window");
 
@@ -27,30 +27,6 @@ const INITIAL_POSITION = {
   longitude: -73.979704,
   latitudeDelta: LATITUDE_DELTA,
   longitudeDelta: LONGITUDE_DELTA,
-};
-
-const InputAutoComplete = ({ placeholder, onPlaceSelected }) => {
-  return (
-    <>
-      <GooglePlacesAutocomplete
-        key={`input-${placeholder}`}
-        styles={{ textInput: styles.input }}
-        placeholder={placeholder || ""}
-        fetchDetails={true}
-        onPress={(data, details = null) => {
-          // console.log("Autocomplete onPress triggered", details);
-          onPlaceSelected(details);
-        }}
-        // onPress={(data, details = null) => console.log(data, details)}
-        onFail={(error) => console.log(error)}
-        onNotFound={() => console.log("no results")}
-        query={{
-          key: "AIzaSyBKX6FzffGaFn0xkKbx_jyRDN1UDPXzy30",
-          language: "pt-BR",
-        }}
-      />
-    </>
-  );
 };
 
 const CrimeTracking = () => {
@@ -184,12 +160,30 @@ const CrimeTracking = () => {
           keyboardShouldPersistTaps="handled"
         >
           <InputAutoComplete
+            styling={{
+              width: "100%",
+              height: 40,
+              borderColor: "gray",
+              borderWidth: 1,
+              borderRadius: 8,
+              paddingHorizontal: 10,
+              backgroundColor: "transparent",
+            }}
             placeholder="From"
             onPlaceSelected={(details) => {
               onPlaceSelected(details, "origin");
             }}
           />
           <InputAutoComplete
+            styling={{
+              width: "100%",
+              height: 40,
+              borderColor: "gray",
+              borderWidth: 1,
+              borderRadius: 8,
+              paddingHorizontal: 10,
+              backgroundColor: "transparent",
+            }}
             placeholder="To"
             onPlaceSelected={(details) => {
               onPlaceSelected(details, "destination");

@@ -1,8 +1,16 @@
 import validator from "is_js";
 
 const postValidation = (body) => {
-  if (validator.empty(body.dateAndTime) || validator.empty(body.description)) {
+  if (
+    !body.dateAndTime ||
+    !body.description ||
+    !body.imageUrl ||
+    !body.latitude ||
+    !body.longitude
+  ) {
     return "Field is empty";
+  } else {
+    return null;
   }
 };
 

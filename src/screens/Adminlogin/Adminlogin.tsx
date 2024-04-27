@@ -35,8 +35,7 @@ const Adminlogin = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       {/* Display the text "MUHAFIZ" */}
       <View style={styles.imageholder}>
-      <Text style={{ fontSize: 50 }}>MUHAFIZ</Text>
-
+        <Text style={{ fontSize: 50 }}>MUHAFIZ</Text>
       </View>
       <ScrollView>
         <View style={styles.loginContainer}>
@@ -58,8 +57,13 @@ const Adminlogin = ({ navigation }) => {
             value={data.password}
             onChangeText={(text) => setData({ ...data, password: text })}
             // onPress={() => navigation.navigate("SendEmail")}
-            isNumber={undefined} onPress={undefined}          />
-          <Button title="Sign in" onPress={navigation.navigate("TotalComplaintsRecords")}  />
+            isNumber={undefined}
+            onPress={undefined}
+          />
+          <Button
+            title="Sign in"
+            onPress={() => navigation.navigate("TotalComplaintsRecords")}
+          />
           <NewtoApp
             text="Forgot password?"
             onPress={() => navigation.navigate("SendEmail")}

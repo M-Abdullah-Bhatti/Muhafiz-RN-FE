@@ -15,7 +15,6 @@ import { ScrollView } from "react-native";
 import axios from "axios";
 import { LOGIN } from "../../configs/urls";
 
-
 const Login = ({ navigation }) => {
   const dispatch = useDispatch();
 

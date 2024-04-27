@@ -59,7 +59,10 @@ function Routes() {
         <Stack.Screen name="SolvedComplaints" component={SolvedComplaints} />
         <Stack.Screen name="AdminLogin" component={Adminlogin} />
         <Stack.Screen name="ComplaintBoxInfo" component={ComplaintBoxInfo} />
-        <Stack.Screen name="TotalComplaintsRecords" component={TotalComplaintsRecords} />
+        <Stack.Screen
+          name="TotalComplaintsRecords"
+          component={TotalComplaintsRecords}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

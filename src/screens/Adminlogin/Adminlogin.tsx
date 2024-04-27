@@ -1,6 +1,6 @@
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, Text, View, Button } from "react-native";
 import { useState } from "react";
-import { StyleSheet, View, Image } from "react-native"; // Import Image from react-native
+import { StyleSheet, Image } from "react-native"; // Import Image from react-native
 import { moderateScale } from "react-native-size-matters";
 import { useDispatch } from "react-redux";
 import { Singin } from "../../store/actions/auth";
@@ -9,48 +9,46 @@ import TextInputField from "../../component/TextInputField";
 import SubmitButton from "../../component/ButtonSubmit";
 import { ShowError, ShowSuccess } from "../../utils/flashMessages";
 import NewtoApp from "../../component/NewtoApp";
-import Adminlogin from "../Adminlogin/Adminlogin";
 import animationPath from "../../constants/animationPath";
 import { ScrollView } from "react-native";
 import axios from "axios";
 import { LOGIN } from "../../configs/urls";
 
-
-const Login = ({ navigation }) => {
+const Adminlogin = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const [data, setData] = useState({
-    email: "",
+    departmentName: "",
     password: "",
   });
 
-  const onLogin = () => {
-    const error = loginValidation(data);
-    if (!error) {
-      dispatch(Singin(data));
-    } else {
-      ShowError(error);
-    }
+  const onLogin = ({ navigation }) => {
+    // const error = loginValidation(data);
+    // if (!error) {
+    //   dispatch(Singin({ departmentName: data.departmentName, password: data.password }));
+    // } else {
+    //   ShowError(error);
+    // }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Display the PNG image */}
+      {/* Display the text "MUHAFIZ" */}
       <View style={styles.imageholder}>
-        <Image
-          source={require("../../assets/images/fit.png")}
-          style={styles.image}
-        />
-        {/* <LottieView source={animationPath.onBoarding} autoPlay/> */}
+      <Text style={{ fontSize: 50 }}>MUHAFIZ</Text>
+
       </View>
       <ScrollView>
         <View style={styles.loginContainer}>
           <TextInputField
-            placeholder="Enter your email"
-            icon_name="envelope"
-            value={data.email}
+            placeholder="Department Name"
+            icon_name="users"
+            value={data.departmentName}
             isSecure={false}
-            onChangeText={(text) => setData({ ...data, email: text })}
+            onChangeText={(text) => setData({ ...data, departmentName: text })}
+            isSignin={undefined}
+            onPress={undefined}
+            isNumber={undefined}
           />
           <TextInputField
             placeholder="Enter your Password"
@@ -59,18 +57,14 @@ const Login = ({ navigation }) => {
             isSignin={true}
             value={data.password}
             onChangeText={(text) => setData({ ...data, password: text })}
+            // onPress={() => navigation.navigate("SendEmail")}
+            isNumber={undefined} onPress={undefined}          />
+          <Button title="Sign in" onPress={navigation.navigate("TotalComplaintsRecords")}  />
+          <NewtoApp
+            text="Forgot password?"
             onPress={() => navigation.navigate("SendEmail")}
-          />
-          <SubmitButton text="Login" onPress={onLogin} />
-          <NewtoApp
-            text="New to the app?"
-            onPress={() => navigation.navigate("Signup")}
-            screen="Register"
-          />
-          <NewtoApp
-            text="Are you an Admin?"
-            onPress={() => navigation.navigate("AdminLogin")}
-            screen="AdminLogin"
+            // onPress={() => navigation.navigate("Signup")}
+            screen="Reset Password"
           />
         </View>
       </ScrollView>
@@ -86,15 +80,17 @@ const styles = StyleSheet.create({
   },
   imageholder: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   loginContainer: {
     flex: 1,
   },
-  image: {
-    width: "100%",
-    height: "100%", // You might want to specify the height as well
-    resizeMode: "contain",
+  imageText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "black",
   },
 });
 
-export default Login;
+export default Adminlogin;

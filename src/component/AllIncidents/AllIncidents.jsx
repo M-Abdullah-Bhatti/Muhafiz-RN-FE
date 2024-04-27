@@ -66,6 +66,9 @@ const AllIncidents = () => {
       ) : (
         <>
           <View style={styles.contactContainer}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={30} color="black" />
+          </TouchableOpacity>
             <Text
               style={{
                 fontSize: 22,

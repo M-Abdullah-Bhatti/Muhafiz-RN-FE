@@ -11,8 +11,9 @@ import {
   Alert,
   Dimensions,
   SafeAreaView,
+  ScrollView,
 } from "react-native";
-import { ScrollView } from "react-native-virtualized-view";
+// import { ScrollView } from "react-native-virtualized-view";
 import { Video } from "expo-av";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
@@ -203,7 +204,7 @@ const PostScreen = () => {
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
-      keyboardShouldPersistTaps="handled"
+      keyboardShouldPersistTaps="always"
     >
       <View style={styles.container}>
         <View style={styles.backButtonContainer}>
@@ -279,9 +280,11 @@ const PostScreen = () => {
           <Text style={styles.label}>What's in your Mind ? ...</Text>
           <TextInput
             style={styles.descriptionInput}
-            onChangeText={setDescription}
+            onChangeText={(text) => setDescription(text)}
             value={description}
             placeholder="Describe the incident"
+            onFocus={() => console.log("TextInput focused")}
+            onBlur={() => console.log("TextInput blurred")}
           />
         </View>
 

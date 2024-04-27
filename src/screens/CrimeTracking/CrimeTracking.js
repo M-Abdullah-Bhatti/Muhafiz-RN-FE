@@ -8,14 +8,18 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  ScrollView,
+  Alert,
 } from "react-native";
-import { ScrollView } from "react-native-virtualized-view";
+// import { ScrollView } from "react-native-virtualized-view";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import MapViewDirections from "react-native-maps-directions";
 import InputAutoComplete from "../../component/Shared/InputAutoComplete";
+import { GetAllData } from "../../axios/NetworkCalls";
+import { GetAllPostsEndPoint } from "../../configs/urls";
 
 const { width, height } = Dimensions.get("window");
 
@@ -29,6 +33,33 @@ const INITIAL_POSITION = {
   longitudeDelta: LONGITUDE_DELTA,
 };
 
+const initialMarkersData = [
+  {
+    id: 1,
+    latitude: 40.767911,
+    longitude: -73.982413,
+    description: "Petty theft reported here last week",
+  },
+  {
+    id: 2,
+    latitude: 40.768911,
+    longitude: -73.981413,
+    description: "Vandalism incident",
+  },
+  {
+    id: 3,
+    latitude: 40.769911,
+    longitude: -73.980413,
+    description: "Assault case reported",
+  },
+  {
+    id: 4,
+    latitude: 40.770911,
+    longitude: -73.979413,
+    description: "Stolen vehicle recovered",
+  },
+];
+
 const CrimeTracking = () => {
   const navigation = useNavigation();
 
@@ -38,6 +69,8 @@ const CrimeTracking = () => {
   const [distance, setDistance] = useState(0);
   const [duration, setDuration] = useState(0);
   const mapRef = useRef(null);
+
+  const [data, setData] = useState([]);
 
   // ==============
 
@@ -68,9 +101,31 @@ const CrimeTracking = () => {
   };
 
   const traceRoute = () => {
+    if (!origin || !destination) {
+      Alert.alert(
+        "Missing Information",
+        "Please specify both source and destination"
+      );
+      return;
+    }
+
     if (origin && destination) {
       setShowDirections(true);
-      mapRef.current?.fitToCoordinates([origin, destination], { edgePadding });
+      // mapRef.current?.fitToCoordinates([origin, destination], { edgePadding });
+
+      // Collect all coordinates you want to fit in the map view
+      let coordinates = [origin, destination];
+      const nearbyMarkers = filterMarkersNearRoute(); // Assuming this returns the markers you want to include
+
+      // Combine the initial coordinates with the markers' coordinates
+      coordinates = coordinates.concat(
+        nearbyMarkers.map((marker) => ({
+          latitude: marker.latitude,
+          longitude: marker.longitude,
+        }))
+      );
+      // Fit all relevant coordinates in the map view
+      mapRef.current?.fitToCoordinates(coordinates, { edgePadding });
     }
   };
 
@@ -88,27 +143,47 @@ const CrimeTracking = () => {
     moveTo(position);
   };
 
-  // ========
+  // ================
 
-  // useEffect(() => {
-  //   (async () => {
-  //     let { status } = await Location.requestForegroundPermissionsAsync();
-  //     if (status !== "granted") {
-  //       console.log("Location permission denied");
-  //       return;
-  //     }
-  //     let location = await Location.getCurrentPositionAsync({
-  //       accuracy: Location.Accuracy.High,
-  //     });
-  //     setRegion({
-  //       ...region,
-  //       latitude: location.coords.latitude,
-  //       longitude: location.coords.longitude,
-  //     });
-  //   })();
-  // }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      const getData = async () => {
+        try {
+          const response = await GetAllData(`${GetAllPostsEndPoint}`);
 
-  // ===========
+          console.log("response?.data-------");
+          console.log(response?.data);
+
+          if (response.success) {
+            setData(response?.data);
+          } else {
+            setError(response?.message);
+          }
+        } catch (err) {
+          setError(err?.message);
+        }
+      };
+
+      getData();
+    }, [])
+  );
+
+  const filterMarkersNearRoute = () => {
+    const threshold = 10; // Define how close markers need to be to the route (in degrees)
+    if (data && data.length > 0) {
+      return data.filter((marker) => {
+        // Example simple check: marker is within threshold degrees of both origin and destination
+        return (
+          Math.abs(marker.latitude - origin.latitude) <= threshold &&
+          Math.abs(marker.longitude - origin.longitude) <= threshold &&
+          Math.abs(marker.latitude - destination.latitude) <= threshold &&
+          Math.abs(marker.longitude - destination.longitude) <= threshold
+        );
+      });
+    }
+  };
+
+  // ==============
 
   return (
     <View style={styles.container}>
@@ -119,8 +194,8 @@ const CrimeTracking = () => {
         initialRegion={INITIAL_POSITION}
         ref={mapRef}
       >
-        {origin && <Marker coordinate={origin} pinColor={"green"} />}
-        {destination && <Marker coordinate={destination} pinColor={"green"} />}
+        {origin && <Marker coordinate={origin} pinColor={"red"} />}
+        {destination && <Marker coordinate={destination} pinColor={"red"} />}
         {showDirections && (
           <MapViewDirections
             origin={origin}
@@ -134,6 +209,21 @@ const CrimeTracking = () => {
             }}
           />
         )}
+
+        {origin &&
+          destination &&
+          data &&
+          data.length > 0 &&
+          filterMarkersNearRoute().map((marker, index) => (
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: marker.latitude,
+                longitude: marker.longitude,
+              }}
+              pinColor={"red"} // different color for crime markers
+            />
+          ))}
       </MapView>
 
       <View style={styles.backButtonContainer}>
@@ -156,8 +246,8 @@ const CrimeTracking = () => {
         </Text>
 
         <ScrollView
-          contentContainerStyle={styles.inputContainer}
-          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="always"
         >
           <InputAutoComplete
             styling={{

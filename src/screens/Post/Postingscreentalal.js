@@ -224,7 +224,7 @@ const Postingscreentalal = () => {
                       <View style={styles.userInfoText}>
                         <Text style={styles.text}>{post?.user?.username}</Text>
                         <Text style={styles.textLite}>
-                          {formatDate(post?.createdAt)}
+                          {formatDate(post?.dateAndTime)}
                         </Text>
                       </View>
                     </View>

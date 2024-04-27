@@ -1,9 +1,9 @@
 import { SafeAreaView, Text, View, Button } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Image } from "react-native"; // Import Image from react-native
 import { moderateScale } from "react-native-size-matters";
 import { useDispatch } from "react-redux";
-import { Singin } from "../../store/actions/auth";
+import { Singin, adminLogin, setCurrentUser } from "../../store/actions/auth";
 import loginValidation from "../../utils/validations/loginValidation";
 import TextInputField from "../../component/TextInputField";
 import SubmitButton from "../../component/ButtonSubmit";
@@ -12,7 +12,11 @@ import NewtoApp from "../../component/NewtoApp";
 import animationPath from "../../constants/animationPath";
 import { ScrollView } from "react-native";
 import axios from "axios";
-import { LOGIN } from "../../configs/urls";
+import { ADMIN_LOGIN, LOGIN } from "../../configs/urls";
+import adminLoginValidation from "../../utils/validations/adminLoginValidation";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import setAuthToken from "../../utils/authToken";
+import jwtDecode from "jwt-decode";
 
 const Adminlogin = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -23,12 +27,34 @@ const Adminlogin = ({ navigation }) => {
   });
 
   const onLogin = ({ navigation }) => {
-    // const error = loginValidation(data);
-    // if (!error) {
-    //   dispatch(Singin({ departmentName: data.departmentName, password: data.password }));
-    // } else {
-    //   ShowError(error);
-    // }
+    const error = adminLoginValidation(data);
+    if (!error) {
+      dispatch(
+        adminLogin({
+          departmentName: data.departmentName,
+          password: data.password,
+        })
+      );
+    } else {
+      ShowError(error);
+    }
+  };
+
+  const adminLogin = (userData) => async (dispatch) => {
+    try {
+      const response = await axios.post(ADMIN_LOGIN, userData);
+      console.log("response: ", response.data.token);
+      const token = response.data.token;
+      await AsyncStorage.setItem("jwt-token", token);
+      const decode = jwtDecode(token);
+      console.log("decode: ", decode);
+      await AsyncStorage.setItem("user", JSON.stringify(decode));
+      // setAuthToken(token);
+      // dispatch(setCurrentUser(decode));
+      navigation.navigate("TotalComplaintsRecords");
+    } catch (error) {
+      ShowError(error.response.data.message);
+    }
   };
 
   return (
@@ -60,21 +86,13 @@ const Adminlogin = ({ navigation }) => {
             isNumber={undefined}
             onPress={undefined}
           />
-          <Button
-            title="Sign in"
-            onPress={() => navigation.navigate("TotalComplaintsRecords")}
-          />
-          <NewtoApp
-            text="Forgot password?"
-            onPress={() => navigation.navigate("SendEmail")}
-            // onPress={() => navigation.navigate("Signup")}
-            screen="Reset Password"
-          />
+          <Button title="Sign in" onPress={onLogin} />
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
+// navigation.navigate("TotalComplaintsRecords")
 
 const styles = StyleSheet.create({
   container: {

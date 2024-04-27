@@ -1,6 +1,6 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LOGIN } from "../../configs/urls";
+import { ADMIN_LOGIN, LOGIN } from "../../configs/urls";
 import setAuthToken from "../../utils/authToken";
 import { ShowError } from "../../utils/flashMessages";
 import jwtDecode from "jwt-decode";
@@ -28,7 +28,21 @@ export const Singin = (userData) => async (dispatch) => {
   }
 };
 
-const setCurrentUser = (decode) => {
+export const adminLogin = (userData) => async (dispatch) => {
+  try {
+    const response = await axios.post(ADMIN_LOGIN, userData);
+    console.log("response: ", response.data.token);
+    const token = response.data.token;
+    await AsyncStorage.setItem("jwt-token", token);
+    setAuthToken(token);
+    const decode = jwtDecode(token);
+    dispatch(setCurrentUser(decode));
+  } catch (error) {
+    ShowError(error.response.data.message);
+  }
+};
+
+export const setCurrentUser = (decode) => {
   return {
     type: SET_CURRENT_USER,
     payload: decode,

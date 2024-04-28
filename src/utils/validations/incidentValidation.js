@@ -1,14 +1,17 @@
 import validator from "is_js";
 
 const incidentValidation = (body) => {
+  console.log("body: ", body);
   if (
-    validator.empty(body.category) ||
-    validator.empty(body.name) ||
-    validator.empty(body.dateAndTime) ||
-    validator.empty(body.location) ||
-    validator.empty(body.description)
+    !body.category ||
+    !body.name ||
+    !body.dateAndTime ||
+    !body.location ||
+    !body.description
   ) {
     return "Field is empty";
+  } else {
+    return null;
   }
 };
 

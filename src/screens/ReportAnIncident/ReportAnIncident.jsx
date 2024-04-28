@@ -1,5 +1,14 @@
 import * as React from "react";
-import { StyleSheet, SafeAreaView, View, Text,  ScrollView, TextInput,TouchableOpacity, Alert } from "react-native";
+import {
+  StyleSheet,
+  SafeAreaView,
+  View,
+  Text,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import color from "../../styles/color";
 import { useNavigation } from "@react-navigation/native";
@@ -9,20 +18,24 @@ import { ShowError } from "../../utils/flashMessages";
 import { CreateIncident } from "../../configs/urls";
 import { PostData } from "../../axios/NetworkCalls";
 import RequestLoader from "../../component/Loader/RequestLoader";
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker } from "react-native-maps";
+import InputAutoComplete from "../../component/Shared/InputAutoComplete";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const ReportAnIncident = ({ route }) => {
   const [name, setName] = React.useState("");
   const [date, setDate] = React.useState("");
-  const [location, setLocation] = React.useState({
-    latitude: 37.78825,
-    longitude: -122.4324,
-  });
+  const [location, setLocation] = React.useState("");
   const [description, setDescription] = React.useState("");
   const navigation = useNavigation();
   const { params } = route;
   const [loader, setLoader] = React.useState(false);
   const auth = useSelector((state) => state.AuthReducer);
+  const [showDatePicker, setShowDatePicker] = React.useState(false);
+
+  const toggleDatePicker = () => {
+    setShowDatePicker((prev) => !prev);
+  };
 
   const handleSubmit = async () => {
     const body = {
@@ -30,7 +43,7 @@ const ReportAnIncident = ({ route }) => {
       user: auth.userData.id,
       name,
       dateAndTime: date,
-      location: `${location.latitude},${location.longitude}`,
+      location: location,
       description,
     };
 
@@ -41,10 +54,15 @@ const ReportAnIncident = ({ route }) => {
         const response = await PostData(CreateIncident, body);
         setLoader(false);
         if (response?.status) {
-          Alert.alert("Success", response?.message, [{
-            text: "Close",
-            onPress: () => navigation.navigate("CaseAssessment", { id: response?.data?._id })
-          }]);
+          Alert.alert("Success", response?.message, [
+            {
+              text: "Close",
+              onPress: () =>
+                navigation.navigate("CaseAssessment", {
+                  id: response?.data?._id,
+                }),
+            },
+          ]);
         } else {
           ShowError(response?.message || "An unexpected error occurred");
         }
@@ -53,72 +71,123 @@ const ReportAnIncident = ({ route }) => {
         ShowError(error.message);
       }
     } else {
-      ShowError(error);
+      ShowError(JSON.stringify(error.toString()));
+    }
+  };
+
+  const onPlaceSelected = (details) => {
+    console.log("Place selected:", details);
+    console.log("Place selected:", details.formatted_address);
+
+    if (details && details.geometry && details.geometry.location) {
+      setLocation(details.formatted_address);
+    } else {
+      console.log("No location details found");
     }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollView}>
-      <View style={styles.container}>
-        <View style={styles.backButtonContainer}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={30} color="black" />
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="always"
+      >
+        <View style={styles.container}>
+          <View style={styles.backButtonContainer}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="arrow-back" size={30} color="black" />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.header}>Report an Incident</Text>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Name</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={setName}
+              value={name}
+              placeholder="Enter your name"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Date and Time of the Incident</Text>
+            <TouchableOpacity
+              onPress={toggleDatePicker}
+              style={{
+                flex: 1,
+              }}
+            >
+              <Text style={styles.input}>
+                {date ? date.toLocaleString() : "Select date and time"}
+              </Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <React.Fragment>
+                <DateTimePicker
+                  testID="dateTimePicker"
+                  value={date || new Date()}
+                  mode="datetime"
+                  is24Hour={false}
+                  onChange={(event, selectedDate) => {
+                    console.log("selectedDate");
+                    console.log(selectedDate);
+
+                    setShowDatePicker(false);
+                    setDate(selectedDate || date);
+                  }}
+                />
+              </React.Fragment>
+            )}
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Location</Text>
+            {/* <MapView
+              style={styles.map}
+              initialRegion={{
+                latitude: 37.78825,
+                longitude: -122.4324,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}
+              onPress={(e) => setLocation(e.nativeEvent.coordinate)}
+            >
+              <Marker coordinate={location} />
+            </MapView> */}
+
+            <InputAutoComplete
+              placeholder="Search..."
+              styling={{
+                backgroundColor: "#f0f0f0",
+                borderRadius: 8,
+                padding: 16,
+                flex: 1,
+              }}
+              onPlaceSelected={(details) => {
+                onPlaceSelected(details);
+              }}
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Description of the Incident</Text>
+            <TextInput
+              style={styles.descriptionInput}
+              onChangeText={setDescription}
+              value={description}
+              placeholder="Describe the incident"
+            />
+          </View>
+
+          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+            {loader ? (
+              <RequestLoader />
+            ) : (
+              <Text style={styles.buttonText}>Submit</Text>
+            )}
           </TouchableOpacity>
         </View>
-        <Text style={styles.header}>Report an Incident</Text>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Name</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={setName}
-            value={name}
-            placeholder="Enter your name"
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Date and Time of the Incident</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={setDate}
-            value={date}
-            placeholder="YYYY-MM-DD HH:MM"
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Location</Text>
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: 37.78825,
-              longitude: -122.4324,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
-            onPress={(e) => setLocation(e.nativeEvent.coordinate)}
-          >
-            <Marker coordinate={location} />
-          </MapView>
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Description of the Incident</Text>
-          <TextInput
-            style={styles.descriptionInput}
-            onChangeText={setDescription}
-            value={description}
-            placeholder="Describe the incident"
-            
-          />
-        </View>
-
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          {loader ? <RequestLoader /> : <Text style={styles.buttonText}>Submit</Text>}
-        </TouchableOpacity>
-      </View>
       </ScrollView>
     </SafeAreaView>
   );

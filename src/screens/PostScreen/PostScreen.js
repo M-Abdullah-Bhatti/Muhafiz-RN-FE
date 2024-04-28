@@ -56,7 +56,8 @@ const PostScreen = () => {
   console.log({ date, description, location });
 
   const onPlaceSelected = (details) => {
-    // console.log("Place selected:", details);
+    console.log("Place selected:", details);
+    console.log("Place selected:", details.formatted_address);
 
     if (details && details.geometry && details.geometry.location) {
       const position = {

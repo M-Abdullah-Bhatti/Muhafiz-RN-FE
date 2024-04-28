@@ -115,7 +115,14 @@ const ComplaintBoxInfo = ({ route }) => {
               : complaint?.description
           }
         />
-        <ListItem label="Location" value={complaint?.location} />
+        <ListItem
+          label="Location"
+          value={
+            complaint?.location.length > 25
+              ? complaint?.location.slice(0, 22) + "..."
+              : complaint?.location
+          }
+        />
         <ListItem label="Date and Time" value={complaint?.dateAndTime} />
         <ListItem
           label="Status"

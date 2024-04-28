@@ -33,33 +33,6 @@ const INITIAL_POSITION = {
   longitudeDelta: LONGITUDE_DELTA,
 };
 
-const initialMarkersData = [
-  {
-    id: 1,
-    latitude: 40.767911,
-    longitude: -73.982413,
-    description: "Petty theft reported here last week",
-  },
-  {
-    id: 2,
-    latitude: 40.768911,
-    longitude: -73.981413,
-    description: "Vandalism incident",
-  },
-  {
-    id: 3,
-    latitude: 40.769911,
-    longitude: -73.980413,
-    description: "Assault case reported",
-  },
-  {
-    id: 4,
-    latitude: 40.770911,
-    longitude: -73.979413,
-    description: "Stolen vehicle recovered",
-  },
-];
-
 const CrimeTracking = () => {
   const navigation = useNavigation();
 
@@ -169,7 +142,7 @@ const CrimeTracking = () => {
   );
 
   const filterMarkersNearRoute = () => {
-    const threshold = 10; // Define how close markers need to be to the route (in degrees)
+    const threshold = 5; // Define how close markers need to be to the route (in degrees)
     if (data && data.length > 0) {
       return data.filter((marker) => {
         // Example simple check: marker is within threshold degrees of both origin and destination

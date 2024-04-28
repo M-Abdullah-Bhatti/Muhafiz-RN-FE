@@ -240,6 +240,18 @@ const styles = StyleSheet.create({
     color: "blue",
     textDecorationLine: "underline",
   },
+  urlContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  urlText: {
+    marginBottom: 5,
+    fontSize: 16,
+  },
+  url: {
+    color: "blue",
+    textDecorationLine: "underline",
+  },
 });
 
 export default MapWithButtons;

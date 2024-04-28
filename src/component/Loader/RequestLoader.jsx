@@ -1,12 +1,12 @@
 import React from "react";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
 
-function RequestLoader({ size }) {
+function RequestLoader({ size, color }) {
   return (
     <View style={styles.centered}>
       <ActivityIndicator
         size={size === "large" ? "large" : "small"}
-        color="blue"
+        color={color ? color : "blue"}
       />
     </View>
   );

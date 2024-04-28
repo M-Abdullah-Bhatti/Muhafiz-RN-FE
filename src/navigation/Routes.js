@@ -16,6 +16,10 @@ import ConnectWithAuth from "../screens/Connectwithauth/ConnectWithAuth";
 import Incidents from "../screens/Incidents/Incidents";
 import EditProfile from "../screens/EditProfile/EditProfile";
 import AllContacts from "../screens/AllContacts/AllContacts";
+import SolvedComplaints from "../screens/Complaints/SolvedComplaints";
+import Adminlogin from "../screens/Adminlogin/Adminlogin";
+import ComplaintBoxInfo from "../screens/ComplaintBoxInfo/ComplaintBoxInfo";
+import TotalComplaintsRecords from "../screens/TotalComplaintsRecords/TotalComplaintsRecords";
 
 const Stack = createNativeStackNavigator();
 
@@ -52,6 +56,13 @@ function Routes() {
         <Stack.Screen name="Incidents" component={Incidents} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="AllContacts" component={AllContacts} />
+        <Stack.Screen name="SolvedComplaints" component={SolvedComplaints} />
+        <Stack.Screen name="AdminLogin" component={Adminlogin} />
+        <Stack.Screen name="ComplaintBoxInfo" component={ComplaintBoxInfo} />
+        <Stack.Screen
+          name="TotalComplaintsRecords"
+          component={TotalComplaintsRecords}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

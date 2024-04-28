@@ -9,6 +9,7 @@ import TextInputField from "../../component/TextInputField";
 import SubmitButton from "../../component/ButtonSubmit";
 import { ShowError, ShowSuccess } from "../../utils/flashMessages";
 import NewtoApp from "../../component/NewtoApp";
+import Adminlogin from "../Adminlogin/Adminlogin";
 import animationPath from "../../constants/animationPath";
 import { ScrollView } from "react-native";
 import axios from "axios";
@@ -64,6 +65,11 @@ const Login = ({ navigation }) => {
             text="New to the app?"
             onPress={() => navigation.navigate("Signup")}
             screen="Register"
+          />
+          <NewtoApp
+            text="Are you an Admin?"
+            onPress={() => navigation.navigate("AdminLogin")}
+            screen="AdminLogin"
           />
         </View>
       </ScrollView>

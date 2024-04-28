@@ -18,6 +18,8 @@ import CaseAssessment from "../screens/CaseAssessment/CaseAssessment";
 import CrimeTracking from "../screens/CrimeTracking/CrimeTracking";
 import CheckList from "../screens/CheckList/CheckList";
 import Notification from "../screens/Notification/Notification";
+import ComplaintBoxInfo from "../screens/ComplaintBoxInfo/ComplaintBoxInfo";
+
 
 //componant
 import Icon, { Icons } from "../component/Icons";
@@ -53,7 +55,7 @@ const TabArr = [
     type: Icons.MaterialCommunityIcons,
     activeIcon: "box-shadow",
     inActiveIcon: "ballot",
-    component: CheckList,
+    component: PostScreen,
   },
   {
     route: "Account",

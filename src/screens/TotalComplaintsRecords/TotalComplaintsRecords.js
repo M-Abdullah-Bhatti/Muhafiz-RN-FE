@@ -112,7 +112,7 @@ const TotalComplaintsRecords = ({ navigation }) => {
           style={styles.profileImage}
         />
         <Text style={styles.chartText}>
-          Total ${Error ? 0 : data?.length} Complaints
+          Total {Error ? 0 : data?.length} Complaints
         </Text>
       </View>
 
